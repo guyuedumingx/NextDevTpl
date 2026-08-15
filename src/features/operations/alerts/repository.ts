@@ -109,12 +109,11 @@ export async function evaluateOperationsAlerts(
 
       results.push({
         key: rule.key,
-        notification:
-          delivery.queued
-            ? prepared.claim.kind === "recovered"
-              ? "recovered"
-              : "sent"
-            : "failed",
+        notification: delivery.queued
+          ? prepared.claim.kind === "recovered"
+            ? "recovered"
+            : "sent"
+          : "failed",
         status: prepared.status,
       });
     } catch (error) {

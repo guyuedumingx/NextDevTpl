@@ -98,9 +98,10 @@ export function PricingSection({ currentPriceId }: PricingSectionProps) {
     currentPriceId ?? null
   );
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
-  const changeRequestRef = useRef<{ priceId: string; requestId: string } | null>(
-    null
-  );
+  const changeRequestRef = useRef<{
+    priceId: string;
+    requestId: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!session?.user || currentPriceId) return;
