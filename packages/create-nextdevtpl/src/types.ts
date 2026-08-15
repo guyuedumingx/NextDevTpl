@@ -18,6 +18,7 @@ export interface CatalogModule {
   kind: "core" | "optional";
   routes: readonly string[];
   schema: readonly string[];
+  telemetryEvents: readonly string[];
   translations: readonly string[];
 }
 

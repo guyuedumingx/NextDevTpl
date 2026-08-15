@@ -10,4 +10,5 @@ export const sharedModule = defineModule({
   navigation: [],
   translations: ["Common", "Cookie", "Theme"],
   schema: [],
+  telemetryEvents: ["api.request.failed", "action.failed", "job.failed"],
 });

@@ -19,4 +19,5 @@ export const pseoModule = defineModule({
   navigation: [],
   translations: [],
   schema: [],
+  telemetryEvents: [],
 });

@@ -33,4 +33,5 @@ export const operationsModule = defineModule({
   ],
   translations: [],
   schema: ["operations"],
+  telemetryEvents: [],
 });

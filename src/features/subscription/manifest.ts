@@ -10,4 +10,5 @@ export const subscriptionModule = defineModule({
   navigation: [],
   translations: ["Subscription"],
   schema: ["subscription"],
+  telemetryEvents: ["subscription.activated"],
 });

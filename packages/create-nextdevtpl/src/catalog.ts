@@ -61,6 +61,7 @@ function parseModule(id: string, value: unknown): CatalogModule {
     !isStringArray(value.dependencies) ||
     !isStringArray(value.routes) ||
     !isStringArray(value.schema) ||
+    !isStringArray(value.telemetryEvents) ||
     !isStringArray(value.translations) ||
     !isStringArray(value.env)
   ) {
@@ -71,6 +72,7 @@ function parseModule(id: string, value: unknown): CatalogModule {
     dependencies: value.dependencies,
     routes: value.routes,
     schema: value.schema,
+    telemetryEvents: value.telemetryEvents,
     translations: value.translations,
     env: value.env,
   };

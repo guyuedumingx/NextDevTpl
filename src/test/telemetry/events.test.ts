@@ -11,7 +11,10 @@ describe("product telemetry entry points", () => {
         context: { identity: { userId: "user-1" } },
       })
     ).toEqual({
-      attributes: { action: "upload.completed", fileType: "pdf" },
+      attributes: {
+        action: "upload.completed",
+        properties: { fileType: "pdf" },
+      },
       context: { identity: { userId: "user-1" } },
       name: "first_value.completed",
       source: "server",

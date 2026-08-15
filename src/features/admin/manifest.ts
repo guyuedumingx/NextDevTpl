@@ -38,4 +38,5 @@ export const adminModule = defineModule({
   ],
   translations: ["AdminSidebar"],
   schema: [],
+  telemetryEvents: [],
 });

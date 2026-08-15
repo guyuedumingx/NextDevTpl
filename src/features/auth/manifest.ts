@@ -31,4 +31,5 @@ export const authModule = defineModule({
   navigation: [],
   translations: ["Auth"],
   schema: ["auth"],
+  telemetryEvents: ["signup.completed", "login.completed", "identity.linked"],
 });

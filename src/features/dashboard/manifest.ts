@@ -25,4 +25,5 @@ export const dashboardModule = defineModule({
   ],
   translations: ["Dashboard", "DashboardPages"],
   schema: [],
+  telemetryEvents: [],
 });

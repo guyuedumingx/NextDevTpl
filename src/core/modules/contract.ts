@@ -1,3 +1,8 @@
+import {
+  type TelemetryEventName,
+  telemetryEventRegistry,
+} from "../services/telemetry";
+
 export const MODULE_IDS = [
   "admin",
   "analytics",
@@ -62,6 +67,7 @@ export interface ModuleManifest {
   navigation: readonly ModuleNavigationItem[];
   translations: readonly string[];
   schema: readonly ModuleSchemaGroup[];
+  telemetryEvents: readonly TelemetryEventName[];
 }
 
 export interface ModuleRegistry {
@@ -82,6 +88,7 @@ export function validateModuleManifests(
   const routeSourceOwners = new Map<string, ModuleId>();
   const navigationOwners = new Map<string, ModuleId>();
   const schemaOwners = new Map<ModuleSchemaGroup, ModuleId>();
+  const telemetryEventOwners = new Map<TelemetryEventName, ModuleId>();
   const translationOwners = new Map<string, ModuleId>();
 
   for (const manifest of manifests) {
@@ -136,6 +143,19 @@ export function validateModuleManifests(
         );
       } else {
         translationOwners.set(namespace, manifest.id);
+      }
+    }
+
+    for (const eventName of manifest.telemetryEvents) {
+      if (!Object.hasOwn(telemetryEventRegistry, eventName)) {
+        errors.push(`模块 ${manifest.id} 发布未登记事件 ${eventName}`);
+        continue;
+      }
+      const owner = telemetryEventOwners.get(eventName);
+      if (owner) {
+        errors.push(`事件 ${eventName} 同时属于 ${owner} 和 ${manifest.id}`);
+      } else {
+        telemetryEventOwners.set(eventName, manifest.id);
       }
     }
   }

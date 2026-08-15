@@ -33,4 +33,11 @@ export const creditsModule = defineModule({
   ],
   translations: ["CreditTransactions"],
   schema: ["credits"],
+  telemetryEvents: [
+    "credits.purchased",
+    "credits.consumed",
+    "credits.expired",
+    "payment.credits.already_granted",
+    "payment.credits.grant_success",
+  ],
 });

@@ -15,4 +15,14 @@ export const paymentModule = defineModule({
   navigation: [],
   translations: [],
   schema: ["payment"],
+  telemetryEvents: [
+    "payment.checkout.started",
+    "payment.checkout.completed",
+    "payment.subscription.created",
+    "payment.subscription.canceled",
+    "payment.subscription.cancel_requested",
+    "payment.subscription.past_due",
+    "payment.subscription.paused",
+    "payment.subscription.upserted",
+  ],
 });

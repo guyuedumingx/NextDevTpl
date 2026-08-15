@@ -19,4 +19,5 @@ export const storageModule = defineModule({
   navigation: [],
   translations: [],
   schema: [],
+  telemetryEvents: [],
 });

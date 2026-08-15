@@ -25,4 +25,5 @@ export const settingsModule = defineModule({
   ],
   translations: ["Settings"],
   schema: [],
+  telemetryEvents: [],
 });

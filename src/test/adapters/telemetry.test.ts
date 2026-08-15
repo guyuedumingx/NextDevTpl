@@ -25,14 +25,17 @@ describe("telemetry event contract", () => {
     const event = createTelemetryEvent(
       {
         attributes: {
-          feature: "upload",
-          nested: {
-            authorization: "Bearer secret",
-            safe: true,
+          action: "upload.completed",
+          properties: {
+            feature: "upload",
+            nested: {
+              authorization: "Bearer secret",
+              safe: true,
+            },
+            password: "hidden",
+            prompt: "private prompt",
+            uploadContent: "private file",
           },
-          password: "hidden",
-          prompt: "private prompt",
-          uploadContent: "private file",
         },
         context: {
           identity: { anonymousId: "anon-1", userId: "user-1" },
@@ -48,8 +51,11 @@ describe("telemetry event contract", () => {
 
     expect(event).toEqual({
       attributes: {
-        feature: "upload",
-        nested: { safe: true },
+        action: "upload.completed",
+        properties: {
+          feature: "upload",
+          nested: { safe: true },
+        },
       },
       context: {
         identity: { anonymousId: "anon-1", userId: "user-1" },
@@ -70,7 +76,7 @@ describe("telemetry event contract", () => {
     expect(() =>
       createTelemetryEvent(
         {
-          name: "invalid event",
+          name: "invalid event" as never,
           source: "server",
           version: 1,
         },
@@ -89,6 +95,41 @@ describe("telemetry event contract", () => {
         eventOptions
       )
     ).toThrow();
+
+    expect(() =>
+      createTelemetryEvent(
+        {
+          name: "billing.unknown" as never,
+          source: "server",
+          version: 1,
+        },
+        eventOptions
+      )
+    ).toThrow();
+
+    expect(() =>
+      createTelemetryEvent(
+        {
+          attributes: { path: "/" },
+          name: "landing.viewed",
+          source: "server",
+          version: 1,
+        },
+        eventOptions
+      )
+    ).toThrow();
+
+    expect(() =>
+      createTelemetryEvent(
+        {
+          attributes: { path: "/" },
+          name: "landing.viewed",
+          source: "client",
+          version: 2,
+        },
+        eventOptions
+      )
+    ).toThrow();
   });
 });
 
@@ -97,7 +138,12 @@ describe("telemetry adapters", () => {
     await expect(
       noopTelemetryAdapter.track(
         createTelemetryEvent(
-          { name: "signup.completed", source: "server", version: 1 },
+          {
+            attributes: { authMethod: "email" },
+            name: "signup.completed",
+            source: "server",
+            version: 1,
+          },
           eventOptions
         )
       )
@@ -115,7 +161,12 @@ describe("telemetry adapters", () => {
       },
     });
     const event = createTelemetryEvent(
-      { name: "signup.completed", source: "server", version: 1 },
+      {
+        attributes: { authMethod: "email" },
+        name: "signup.completed",
+        source: "server",
+        version: 1,
+      },
       eventOptions
     );
 
@@ -149,7 +200,12 @@ describe("telemetry adapters", () => {
     });
 
     await expect(
-      service.track({ name: "signup.completed", source: "server", version: 1 })
+      service.track({
+        attributes: { authMethod: "email" },
+        name: "signup.completed",
+        source: "server",
+        version: 1,
+      })
     ).resolves.toBeUndefined();
     expect(onAdapterError).toHaveBeenCalledWith(
       error,
@@ -168,9 +224,12 @@ describe("telemetry adapters", () => {
     });
     const event = createTelemetryEvent(
       {
-        attributes: { password: "hidden", plan: "pro" },
+        attributes: {
+          action: "plan.selected",
+          properties: { password: "hidden", plan: "pro" },
+        },
         context: { identity: { anonymousId: "anon-1", userId: "user-1" } },
-        name: "subscription.activated",
+        name: "first_value.completed",
         source: "server",
         version: 1,
       },
@@ -186,7 +245,7 @@ describe("telemetry adapters", () => {
     };
     expect(body.distinct_id).toBe("user-1");
     expect(body.properties.$anon_distinct_id).toBe("anon-1");
-    expect(body.properties.password).toBeUndefined();
+    expect(body.properties.properties).toEqual({ plan: "pro" });
   });
 
   it("uses the GA4 Measurement Protocol contract", async () => {
@@ -202,7 +261,12 @@ describe("telemetry adapters", () => {
 
     await adapter.track(
       createTelemetryEvent(
-        { name: "landing.viewed", source: "client", version: 1 },
+        {
+          attributes: { path: "/" },
+          name: "landing.viewed",
+          source: "client",
+          version: 1,
+        },
         eventOptions
       )
     );
@@ -231,8 +295,8 @@ describe("telemetry adapters", () => {
       createTelemetryEvent(
         {
           attributes: { path: "/zh/pricing" },
-          name: "core_action.completed",
-          source: "server",
+          name: "page.viewed",
+          source: "client",
           version: 1,
         },
         eventOptions

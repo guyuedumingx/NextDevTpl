@@ -1,10 +1,10 @@
-import type { JsonObject } from "@/core/services";
+import type { JsonObject, TelemetryEventName } from "@/core/services";
 import { hasAnalyticsConsent } from "@/lib/cookie-consent";
 import { getClientTelemetryHeaders } from "./identity";
 
 export interface ClientTelemetryEvent {
   attributes?: JsonObject;
-  name: string;
+  name: TelemetryEventName;
   version: number;
 }
 

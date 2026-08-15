@@ -15,4 +15,10 @@ export const analyticsModule = defineModule({
   navigation: [],
   translations: [],
   schema: [],
+  telemetryEvents: [
+    "landing.viewed",
+    "page.viewed",
+    "first_value.completed",
+    "core_action.completed",
+  ],
 });

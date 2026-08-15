@@ -10,6 +10,7 @@
       ],
       "schema": [],
       "translations": ["AdminSidebar"],
+      "telemetryEvents": [],
       "env": []
     },
     "analytics": {
@@ -18,6 +19,12 @@
       "routes": ["src/app/api/telemetry/route.ts"],
       "schema": [],
       "translations": [],
+      "telemetryEvents": [
+        "landing.viewed",
+        "page.viewed",
+        "first_value.completed",
+        "core_action.completed"
+      ],
       "env": [
         "NEXT_PUBLIC_GA_ID",
         "POSTHOG_API_KEY",
@@ -43,6 +50,11 @@
       ],
       "schema": ["auth"],
       "translations": ["Auth"],
+      "telemetryEvents": [
+        "signup.completed",
+        "login.completed",
+        "identity.linked"
+      ],
       "env": [
         "DATABASE_URL",
         "BETTER_AUTH_SECRET",
@@ -62,6 +74,7 @@
       ],
       "schema": [],
       "translations": [],
+      "telemetryEvents": [],
       "env": []
     },
     "credits": {
@@ -74,6 +87,13 @@
       ],
       "schema": ["credits"],
       "translations": ["CreditTransactions"],
+      "telemetryEvents": [
+        "credits.purchased",
+        "credits.consumed",
+        "credits.expired",
+        "payment.credits.already_granted",
+        "payment.credits.grant_success"
+      ],
       "env": ["CRON_SECRET"]
     },
     "dashboard": {
@@ -82,6 +102,7 @@
       "routes": ["src/app/[locale]/(dashboard)/dashboard/page.tsx"],
       "schema": [],
       "translations": ["Dashboard", "DashboardPages"],
+      "telemetryEvents": [],
       "env": []
     },
     "mail": {
@@ -90,6 +111,7 @@
       "routes": [],
       "schema": ["mail"],
       "translations": [],
+      "telemetryEvents": [],
       "env": []
     },
     "marketing": {
@@ -114,6 +136,7 @@
         "Pricing",
         "Footer"
       ],
+      "telemetryEvents": [],
       "env": []
     },
     "operations": {
@@ -126,6 +149,7 @@
       ],
       "schema": ["operations"],
       "translations": [],
+      "telemetryEvents": [],
       "env": [
         "CRON_SECRET",
         "ALERT_COOLDOWN_MINUTES",
@@ -139,6 +163,16 @@
       "routes": ["src/app/api/webhooks/payment/route.ts"],
       "schema": ["payment"],
       "translations": [],
+      "telemetryEvents": [
+        "payment.checkout.started",
+        "payment.checkout.completed",
+        "payment.subscription.created",
+        "payment.subscription.canceled",
+        "payment.subscription.cancel_requested",
+        "payment.subscription.past_due",
+        "payment.subscription.paused",
+        "payment.subscription.upserted"
+      ],
       "env": [
         "NEXT_PUBLIC_PRICE_STARTER_MONTHLY",
         "NEXT_PUBLIC_PRICE_STARTER_YEARLY",
@@ -157,6 +191,7 @@
       ],
       "schema": [],
       "translations": [],
+      "telemetryEvents": [],
       "env": []
     },
     "settings": {
@@ -165,6 +200,7 @@
       "routes": ["src/app/[locale]/(dashboard)/dashboard/settings/page.tsx"],
       "schema": [],
       "translations": ["Settings"],
+      "telemetryEvents": [],
       "env": []
     },
     "shared": {
@@ -173,6 +209,7 @@
       "routes": [],
       "schema": [],
       "translations": ["Common", "Cookie", "Theme"],
+      "telemetryEvents": ["api.request.failed", "action.failed", "job.failed"],
       "env": []
     },
     "storage": {
@@ -184,6 +221,7 @@
       ],
       "schema": [],
       "translations": [],
+      "telemetryEvents": [],
       "env": ["STORAGE_BUCKET_NAME", "NEXT_PUBLIC_AVATARS_BUCKET_NAME"]
     },
     "subscription": {
@@ -192,6 +230,7 @@
       "routes": [],
       "schema": ["subscription"],
       "translations": ["Subscription"],
+      "telemetryEvents": ["subscription.activated"],
       "env": []
     },
     "support": {
@@ -206,6 +245,7 @@
       ],
       "schema": ["support"],
       "translations": ["Support"],
+      "telemetryEvents": [],
       "env": []
     }
   },

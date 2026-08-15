@@ -45,7 +45,7 @@ export interface TelemetryContext {
 export interface TelemetryEventInput {
   attributes?: JsonObject;
   context?: TelemetryContext;
-  name: string;
+  name: TelemetryEventName;
   source: TelemetrySource;
   version: number;
 }
@@ -55,7 +55,7 @@ export interface TelemetryEvent {
   context: TelemetryContext;
   environment: TelemetryEnvironment;
   eventId: string;
-  name: string;
+  name: TelemetryEventName;
   occurredAt: string;
   release?: string;
   source: TelemetrySource;
@@ -79,7 +79,6 @@ export interface TelemetryServiceOptions {
   release?: string;
 }
 
-const eventNamePattern = /^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$/;
 const identifierSchema = z.string().min(1).max(128);
 
 function isJsonValue(value: unknown): value is JsonValue {
@@ -140,23 +139,423 @@ const contextSchema = z
   })
   .strict();
 
-export const telemetryEventInputSchema = z
+const labelSchema = z.string().min(1).max(128);
+const providerSchema = z.string().min(1).max(64);
+const pathSchema = z.string().min(1).max(256);
+const authMethodSchema = z.enum(["email", "social", "unknown"]);
+const emptyAttributesSchema = z.object({}).strict();
+
+const productAttributesSchema = z
+  .object({
+    action: labelSchema,
+    properties: z.record(z.string().min(1).max(64), jsonValueSchema).optional(),
+  })
+  .strict();
+
+const checkoutStartedAttributesSchema = z
+  .object({
+    checkoutType: z.enum(["credits", "one-time", "subscription"]),
+    credits: z.number().int().positive().optional(),
+    packageId: labelSchema.optional(),
+    planId: labelSchema.optional(),
+    priceId: labelSchema.optional(),
+    provider: providerSchema,
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.checkoutType === "credits") {
+      if (!value.packageId || value.credits === undefined) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Credit checkout events require packageId and credits",
+          path: ["packageId"],
+        });
+      }
+      return;
+    }
+
+    if (!value.planId || !value.priceId) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Subscription checkout events require planId and priceId",
+        path: ["priceId"],
+      });
+    }
+  });
+
+export const telemetryEventRegistry = {
+  "landing.viewed": {
+    versions: {
+      1: {
+        attributes: z.object({ path: pathSchema }).strict(),
+        sources: ["client"],
+      },
+    },
+  },
+  "page.viewed": {
+    versions: {
+      1: {
+        attributes: z.object({ path: pathSchema }).strict(),
+        sources: ["client"],
+      },
+    },
+  },
+  "signup.completed": {
+    versions: {
+      1: {
+        attributes: z.object({ authMethod: authMethodSchema }).strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "login.completed": {
+    versions: {
+      1: {
+        attributes: z.object({ authMethod: authMethodSchema }).strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "identity.linked": {
+    versions: {
+      1: {
+        attributes: z
+          .object({ authMethod: authMethodSchema, provider: providerSchema })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "first_value.completed": {
+    versions: {
+      1: { attributes: productAttributesSchema, sources: ["server"] },
+    },
+  },
+  "core_action.completed": {
+    versions: {
+      1: { attributes: productAttributesSchema, sources: ["server"] },
+    },
+  },
+  "api.request.failed": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            durationMs: z.number().int().nonnegative().optional(),
+            failureClass: z.enum([
+              "authorization",
+              "exception",
+              "http",
+              "rate_limited",
+              "validation",
+            ]),
+            method: z.string().min(1).max(16),
+            path: pathSchema,
+            statusCode: z.number().int().nonnegative(),
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "action.failed": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            action: labelSchema,
+            durationMs: z.number().int().nonnegative().optional(),
+            failureClass: z.enum([
+              "authorization",
+              "exception",
+              "http",
+              "rate_limited",
+              "validation",
+            ]),
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "job.failed": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            durationMs: z.number().int().nonnegative().optional(),
+            failureClass: z.enum([
+              "authorization",
+              "exception",
+              "http",
+              "rate_limited",
+              "validation",
+            ]),
+            jobName: labelSchema,
+            phase: z.enum(["dispatch", "execution"]),
+            provider: providerSchema,
+            retryable: z.boolean().optional(),
+          })
+          .strict(),
+        sources: ["system"],
+      },
+    },
+  },
+  "payment.checkout.started": {
+    versions: {
+      1: { attributes: checkoutStartedAttributesSchema, sources: ["server"] },
+    },
+  },
+  "payment.checkout.completed": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            checkoutType: labelSchema,
+            customerId: labelSchema,
+            productId: labelSchema,
+            provider: providerSchema,
+            subscriptionId: labelSchema.optional(),
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "credits.purchased": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            amount: z.number().int().positive(),
+            granted: z.boolean(),
+            packageId: labelSchema,
+            productId: labelSchema,
+            provider: providerSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "credits.consumed": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            amount: z.number().int().positive(),
+            serviceName: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "credits.expired": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            count: z.number().int().nonnegative(),
+            totalExpired: z.number().int().nonnegative(),
+          })
+          .strict(),
+        sources: ["system"],
+      },
+    },
+  },
+  "payment.subscription.created": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            priceId: labelSchema,
+            provider: providerSchema,
+            status: labelSchema,
+            subscriptionId: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.subscription.canceled": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            cancelAtPeriodEnd: z.boolean(),
+            periodEnd: z.string().datetime({ offset: true }).nullable(),
+            provider: providerSchema,
+            subscriptionId: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.subscription.cancel_requested": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            periodEnd: z.string().datetime({ offset: true }),
+            provider: providerSchema,
+            subscriptionId: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.subscription.past_due": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            provider: providerSchema,
+            status: z.literal("past_due"),
+            subscriptionId: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.subscription.paused": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            provider: providerSchema,
+            status: z.literal("paused"),
+            subscriptionId: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.subscription.upserted": {
+    versions: {
+      1: {
+        attributes: z
+          .object({ provider: providerSchema, subscriptionId: labelSchema })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.credits.already_granted": {
+    versions: {
+      1: {
+        attributes: z.object({ periodKey: labelSchema }).strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "payment.credits.grant_success": {
+    versions: {
+      1: {
+        attributes: z
+          .object({
+            batchId: labelSchema,
+            credits: z.number().int().positive(),
+            granted: z.boolean(),
+            planType: labelSchema,
+          })
+          .strict(),
+        sources: ["server"],
+      },
+    },
+  },
+  "subscription.activated": {
+    versions: {
+      1: { attributes: emptyAttributesSchema, sources: ["server"] },
+    },
+  },
+} as const;
+
+export type TelemetryEventName = keyof typeof telemetryEventRegistry;
+
+function addEventDefinitionIssues(
+  value: {
+    attributes?: unknown;
+    name: string;
+    source: TelemetrySource;
+    version: number;
+  },
+  ctx: z.RefinementCtx
+): void {
+  const definition = telemetryEventRegistry[value.name as TelemetryEventName];
+  if (!definition) {
+    ctx.addIssue({
+      code: "custom",
+      message: `Telemetry event is not registered: ${value.name}`,
+      path: ["name"],
+    });
+    return;
+  }
+
+  const versionDefinition = (
+    definition.versions as Readonly<
+      Record<
+        number,
+        { attributes: z.ZodType; sources: readonly TelemetrySource[] }
+      >
+    >
+  )[value.version];
+  if (!versionDefinition) {
+    ctx.addIssue({
+      code: "custom",
+      message: `Telemetry event version is not registered: ${value.name}@${value.version}`,
+      path: ["version"],
+    });
+    return;
+  }
+
+  if (!versionDefinition.sources.includes(value.source)) {
+    ctx.addIssue({
+      code: "custom",
+      message: `Telemetry event source is not allowed: ${value.name}`,
+      path: ["source"],
+    });
+  }
+
+  const attributes = versionDefinition.attributes.safeParse(
+    value.attributes ?? {}
+  );
+  if (!attributes.success) {
+    for (const issue of attributes.error.issues) {
+      ctx.addIssue({
+        code: "custom",
+        message: issue.message,
+        path: ["attributes", ...issue.path],
+      });
+    }
+  }
+}
+
+const telemetryEventInputBaseSchema = z
   .object({
     attributes: z.record(z.string().min(1).max(64), jsonValueSchema).optional(),
     context: contextSchema.optional(),
-    name: z.string().regex(eventNamePattern),
+    name: z.string(),
     source: z.enum(["client", "server", "system"]),
     version: z.number().int().positive().max(100),
   })
   .strict();
 
-export const telemetryEventSchema = z
+export const telemetryEventInputSchema =
+  telemetryEventInputBaseSchema.superRefine(addEventDefinitionIssues);
+
+const telemetryEventBaseSchema = z
   .object({
     attributes: z.record(z.string().min(1).max(64), jsonValueSchema),
     context: contextSchema,
     environment: z.enum(["development", "preview", "production", "test"]),
     eventId: identifierSchema,
-    name: z.string().regex(eventNamePattern),
+    name: z.string(),
     occurredAt: z.string().datetime({ offset: true }),
     release: z.string().min(1).max(128).optional(),
     source: z.enum(["client", "server", "system"]),
@@ -164,11 +563,15 @@ export const telemetryEventSchema = z
   })
   .strict();
 
+export const telemetryEventSchema = telemetryEventBaseSchema.superRefine(
+  addEventDefinitionIssues
+);
+
 export function parseTelemetryEventInput(input: unknown): TelemetryEventInput {
   const parsed = telemetryEventInputSchema.parse(input);
 
   return {
-    name: parsed.name,
+    name: parsed.name as TelemetryEventName,
     source: parsed.source,
     version: parsed.version,
     ...(parsed.attributes

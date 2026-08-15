@@ -50,4 +50,5 @@ export const supportModule = defineModule({
   ],
   translations: ["Support"],
   schema: ["support"],
+  telemetryEvents: [],
 });

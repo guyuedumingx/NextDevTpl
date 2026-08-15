@@ -696,13 +696,17 @@ async function updateSubscriptionState(
     subscriptionId: externalSubscription.id,
     provider: paymentService.provider,
   });
+  const eventName =
+    status === "past_due"
+      ? "payment.subscription.past_due"
+      : "payment.subscription.paused";
   trackServerEvent({
     attributes: {
       provider: paymentService.provider,
       status,
       subscriptionId: externalSubscription.id,
     },
-    name: `payment.subscription.${status}`,
+    name: eventName,
     source: "server",
     version: 1,
   });

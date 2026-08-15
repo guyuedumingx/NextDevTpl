@@ -22,8 +22,8 @@ export function createProductTelemetryEventInput(
 
   return {
     attributes: {
-      ...(input.attributes ?? {}),
       action,
+      ...(input.attributes ? { properties: input.attributes } : {}),
     },
     ...(input.context ? { context: input.context } : {}),
     name,

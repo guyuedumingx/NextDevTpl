@@ -10,4 +10,5 @@ export const mailModule = defineModule({
   navigation: [],
   translations: [],
   schema: ["mail"],
+  telemetryEvents: [],
 });

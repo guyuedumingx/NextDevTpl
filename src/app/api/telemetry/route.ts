@@ -4,10 +4,11 @@ import { z } from "zod";
 import {
   type JsonObject,
   type TelemetryEventInput,
+  type TelemetryEventName,
   telemetryEventInputSchema,
 } from "@/core/services";
 import { withApiLogging } from "@/lib/api-logger";
-import { readRequestBody, RequestBodyTooLargeError } from "@/lib/request-body";
+import { RequestBodyTooLargeError, readRequestBody } from "@/lib/request-body";
 import { getTelemetryContextFromRequest } from "@/lib/telemetry/identity";
 import { telemetryService } from "@/services/telemetry";
 
@@ -68,7 +69,7 @@ export const POST = withApiLogging(async (request: Request) => {
       ? { attributes: parsed.data.attributes as JsonObject }
       : {}),
     context: getTelemetryContextFromRequest(request),
-    name: parsed.data.name,
+    name: parsed.data.name as TelemetryEventName,
     source: "client",
     version: parsed.data.version,
   };
