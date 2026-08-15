@@ -44,9 +44,9 @@ DSN 用于运行时上报，Auth Token 只供构建或发布上传 sourcemap。C
 | --- | --- | --- |
 | `noop` | 无 | 本地或可信环境，不提供防滥用 |
 | `upstash` | REST URL、REST Token | Server、Docker、Vercel |
-| `cloudflare-rate-limit` | 六个 Rate Limiting Binding | Cloudflare Workers |
+| `cloudflare-rate-limit` | 七个 Rate Limiting Binding | Cloudflare Workers |
 
-Cloudflare 组合按 `global`、`auth`、`ai`、`payment`、`upload`、`strict` 分开绑定。
+Cloudflare 组合按 `global`、`auth`、`ai`、`payment`、`upload`、`strict`、`telemetry` 分开绑定。
 生成的默认阈值是起点，上线前按实际流量和接口成本调整。
 
 ## 健康检查

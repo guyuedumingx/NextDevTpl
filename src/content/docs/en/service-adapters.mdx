@@ -37,7 +37,7 @@ leave most product flows unchanged.
 | Jobs | `cloudflare-workflows` | Worker | `NEXTDEVTPL_WORKFLOW` binding |
 | Rate limit | `noop` | Universal | None; suitable for local or trusted networks |
 | Rate limit | `upstash` | Universal | Upstash REST URL and token |
-| Rate limit | `cloudflare-rate-limit` | Worker | Six Rate Limiting bindings |
+| Rate limit | `cloudflare-rate-limit` | Worker | Seven Rate Limiting bindings |
 
 The generator keeps only the selected implementation, packages, and variables.
 For Cloudflare it writes required bindings to `wrangler.jsonc`; create remote

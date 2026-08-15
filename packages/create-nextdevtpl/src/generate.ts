@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readdir, readFile, rm } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 
@@ -51,14 +52,17 @@ const ENV_DEFAULTS: Readonly<Record<string, string>> = {
   POSTGRES_USER: "nextdevtpl",
 };
 
+const CLOUDFLARE_RATE_LIMIT_NAMESPACE_BUCKETS = 200_000_000;
+const CLOUDFLARE_RATE_LIMIT_NAMESPACE_STRIDE = 10;
+
 const CLOUDFLARE_RATE_LIMITS = [
-  { id: "1001", limit: 100, name: "RATE_LIMIT_GLOBAL" },
-  { id: "1002", limit: 5, name: "RATE_LIMIT_AUTH" },
-  { id: "1003", limit: 20, name: "RATE_LIMIT_AI" },
-  { id: "1004", limit: 10, name: "RATE_LIMIT_PAYMENT" },
-  { id: "1005", limit: 30, name: "RATE_LIMIT_UPLOAD" },
-  { id: "1006", limit: 3, name: "RATE_LIMIT_STRICT" },
-  { id: "1007", limit: 60, name: "RATE_LIMIT_TELEMETRY" },
+  { limit: 100, name: "RATE_LIMIT_GLOBAL", slot: 1 },
+  { limit: 5, name: "RATE_LIMIT_AUTH", slot: 2 },
+  { limit: 20, name: "RATE_LIMIT_AI", slot: 3 },
+  { limit: 10, name: "RATE_LIMIT_PAYMENT", slot: 4 },
+  { limit: 30, name: "RATE_LIMIT_UPLOAD", slot: 5 },
+  { limit: 3, name: "RATE_LIMIT_STRICT", slot: 6 },
+  { limit: 60, name: "RATE_LIMIT_TELEMETRY", slot: 7 },
 ] as const;
 
 function projectName(target: string): string {
@@ -68,6 +72,17 @@ function projectName(target: string): string {
       .replace(/[^a-z0-9._-]+/g, "-")
       .replace(/^-+|-+$/g, "") || "nextdevtpl-app"
   );
+}
+
+function cloudflareRateLimitNamespaceBase(project: string): number {
+  const digest = createHash("sha256")
+    .update(`nextdevtpl:cloudflare-rate-limit:${project}`)
+    .digest();
+  return digest.readUInt32BE(0) % CLOUDFLARE_RATE_LIMIT_NAMESPACE_BUCKETS;
+}
+
+function cloudflareRateLimitNamespaceId(base: number, slot: number): string {
+  return String(base * CLOUDFLARE_RATE_LIMIT_NAMESPACE_STRIDE + slot);
 }
 
 function cloudflareCompatibilityDate(): string {
@@ -234,6 +249,7 @@ function cloudflareConfig(
   selection: ProjectSelection
 ): Record<string, unknown> {
   const name = projectName(target);
+  const namespaceBase = cloudflareRateLimitNamespaceBase(name);
   const bindings = new Set(selection.bindings);
   return {
     $schema: "node_modules/wrangler/config-schema.json",
@@ -279,7 +295,10 @@ function cloudflareConfig(
       ? {
           ratelimits: CLOUDFLARE_RATE_LIMITS.map((item) => ({
             name: item.name,
-            namespace_id: item.id,
+            namespace_id: cloudflareRateLimitNamespaceId(
+              namespaceBase,
+              item.slot
+            ),
             simple: { limit: item.limit, period: 60 },
           })),
         }

@@ -36,7 +36,7 @@ description: 选择和使用支付、存储、邮件、AI、任务与限流实�
 | 任务 | `cloudflare-workflows` | Worker | `NEXTDEVTPL_WORKFLOW` Binding |
 | 限流 | `noop` | 通用 | 无，适合本地或可信内网 |
 | 限流 | `upstash` | 通用 | Upstash REST URL 与 Token |
-| 限流 | `cloudflare-rate-limit` | Worker | 六个 Rate Limiting Bindings |
+| 限流 | `cloudflare-rate-limit` | Worker | 七个 Rate Limiting Bindings |
 
 生成器只保留选中的实现、依赖和环境变量。Cloudflare 目标会把所需 Binding 写入
 `wrangler.jsonc`；创建远端 R2 bucket 等资源后，还需要把生成的占位配置补完整。

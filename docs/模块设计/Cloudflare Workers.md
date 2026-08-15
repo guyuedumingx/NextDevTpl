@@ -9,7 +9,7 @@
 >
 > 当前状态：已完成
 >
-> 最近更新时间：2026-07-31
+> 最近更新时间：2026-08-15
 
 ## 职责与边界
 
@@ -55,6 +55,9 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
   生成，禁止手写一份容易漂移的 `Env`。
 - R2 使用 Wrangler 自动预配，配置文件不携带账号资源 ID。Workers AI、
   Rate Limiting、Email 和 Workflows 只在对应适配器被选择时声明。
+- Rate Limiting `namespace_id` 必须在账户内唯一。生成器按 Worker 项目名派生一个稳定
+  的正整数基址，并为每个用途分配固定槽位，避免多个生成项目共享计数器；需要跨 Worker
+  共享限额时，应在部署配置中显式协调 namespace。
 - 服务层从 Workers 运行时 `env` 获取 Binding，再注入 M2 适配器；业务模块不
   导入 Cloudflare SDK，也不调用 Cloudflare REST API。
 - 开启 Workers Logs，并使用采样配置控制日志量。密钥通过 `wrangler secret`
@@ -70,7 +73,8 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
 - 根模板已加入 OpenNext、Wrangler、Workers 入口和构建、预览、部署、类型生成
   命令。Open Graph 与 Twitter 图片改用 Node.js runtime，满足 OpenNext 构建要求。
 - 生成器只为 Cloudflare 目标保留 OpenNext 文件和依赖，并按所选适配器生成 R2、
-  Workers AI、Email、Workflow 和六组 Rate Limiting Bindings；生成完成后自动执行
+  Workers AI、Email、Workflow 和七组 Rate Limiting Bindings；namespace 按 Worker
+  项目名稳定派生，生成完成后自动执行
   `wrangler types`。
 - Cloudflare 目标使用 Neon HTTP + Neon Serverless 事务入口，移除 `pg`、`ws` 和
   Sentry 依赖。监控保留
@@ -169,6 +173,8 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
 - 调度测试 Workflow，读取实例状态，验证至少一个持久化步骤完成；失败重试
   逻辑由单测和 Workflow 配置共同覆盖。
 - 检查产物启动时间、Workers Logs 配置和未处理的 Node.js 专用 API。
+- 生成两个不同 Worker 项目的 Cloudflare 配置，确认七个 namespace 均为正整数、项目内
+  不重复且项目间不共享；同名项目在不同目录生成时应保持相同 namespace。
 
 ## 待扩展项
 
@@ -203,3 +209,5 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
   Creem 签名改用 Web Crypto，生成项目增加 Cloudflare 部署预检、Windows OpenNext
   提示和兼容日期校验；部署预检会同时阻止本地配置缺失，主题 Provider 在语言
   路由切换时按 locale 重置，确保明暗模式文案使用当前语言。
+- 2026-08-15：Rate Limiting namespace 改为按 Worker 项目名稳定派生，避免生成项目间共享
+  固定 namespace，并补充生成器隔离验证。

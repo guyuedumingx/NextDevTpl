@@ -190,6 +190,7 @@ describe("project generation", () => {
       r2_buckets: Array<{ binding: string }>;
       ratelimits: Array<{
         name: string;
+        namespace_id: string;
         simple: { limit: number; period: number };
       }>;
       send_email: Array<{ name: string }>;
@@ -265,12 +266,12 @@ describe("project generation", () => {
     expect(wrangler.ratelimits).toHaveLength(7);
     expect(wrangler.ratelimits).toContainEqual({
       name: "RATE_LIMIT_AUTH",
-      namespace_id: "1002",
+      namespace_id: expect.stringMatching(/^[1-9]\d*$/u),
       simple: { limit: 5, period: 60 },
     });
     expect(wrangler.ratelimits).toContainEqual({
       name: "RATE_LIMIT_TELEMETRY",
-      namespace_id: "1007",
+      namespace_id: expect.stringMatching(/^[1-9]\d*$/u),
       simple: { limit: 60, period: 60 },
     });
     expect(database).toContain('from "drizzle-orm/neon-http"');
@@ -347,6 +348,44 @@ describe("project generation", () => {
     expect(await exists(join(target, "sentry.server.config.ts"))).toBe(false);
     expect(environment).not.toContain("SENTRY_AUTH_TOKEN");
     expect(environment).not.toContain("NEXT_PUBLIC_SENTRY_DSN");
+  });
+
+  it("isolates Cloudflare rate-limit namespaces per generated project", async () => {
+    const firstTarget = join(root, "rate-limit-project-a");
+    const secondTarget = join(root, "rate-limit-project-b");
+    const stableTargetA = join(root, "stable-a", "same-project");
+    const stableTargetB = join(root, "stable-b", "same-project");
+
+    for (const target of [
+      firstTarget,
+      secondTarget,
+      stableTargetA,
+      stableTargetB,
+    ]) {
+      await generateProject({
+        targetDirectory: target,
+        preset: "ai-saas",
+        install: false,
+      });
+    }
+
+    const readNamespaceIds = async (target: string): Promise<string[]> => {
+      const wrangler = JSON.parse(
+        await readFile(join(target, "wrangler.jsonc"), "utf8")
+      ) as { ratelimits: Array<{ namespace_id: string }> };
+      return wrangler.ratelimits.map((item) => item.namespace_id);
+    };
+
+    const firstIds = await readNamespaceIds(firstTarget);
+    const secondIds = await readNamespaceIds(secondTarget);
+    const stableIdsA = await readNamespaceIds(stableTargetA);
+    const stableIdsB = await readNamespaceIds(stableTargetB);
+
+    expect(firstIds).toHaveLength(7);
+    expect(new Set(firstIds).size).toBe(7);
+    expect(firstIds.every((id) => /^[1-9]\d*$/u.test(id))).toBe(true);
+    expect(new Set([...firstIds, ...secondIds]).size).toBe(14);
+    expect(stableIdsA).toEqual(stableIdsB);
   });
 
   it("generates a stable custom module and adapter selection", async () => {

@@ -50,9 +50,9 @@ monitoring; it is separate from the product-event adapters above.
 | --- | --- | --- |
 | `noop` | None | Local or trusted environments; no abuse protection |
 | `upstash` | REST URL and REST token | Server, Docker, Vercel |
-| `cloudflare-rate-limit` | Six Rate Limiting bindings | Cloudflare Workers |
+| `cloudflare-rate-limit` | Seven Rate Limiting bindings | Cloudflare Workers |
 
-Cloudflare separates `global`, `auth`, `ai`, `payment`, `upload`, and `strict`
+Cloudflare separates `global`, `auth`, `ai`, `payment`, `upload`, `strict`, and `telemetry`
 bindings. Generated thresholds are a starting point; tune them for real traffic
 and endpoint cost.
 
