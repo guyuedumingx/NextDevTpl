@@ -76,8 +76,8 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
   Workers AI、Email、Workflow 和七组 Rate Limiting Bindings；namespace 按 Worker
   项目名稳定派生，生成完成后自动执行
   `wrangler types`。
-- Cloudflare 目标使用 Neon HTTP + Neon Serverless 事务入口，移除 `pg`、`ws` 和
-  Sentry 依赖。监控保留
+- Cloudflare 目标使用 Neon HTTP 查询和 Neon Serverless 事务入口，`db.transaction`
+  会路由到请求级事务连接池，移除 `pg`、`ws` 和 Sentry 依赖。监控保留
   `console` 错误日志，Sentry 上报和 tracing 在该目标中暂不提供。生成器还会
   用 Workers 专用 `console` logger 替换 Pino，并移除 `pino` 与 `pino-pretty`，
   避免 Pino 的 Node.js stdout 写入在 Worker 内触发运行时异常。
@@ -97,7 +97,8 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
   Compatibility Date 也能使用 `process.env` 回退；生成器会拒绝无效或晚于 UTC
   当前日期的 `CF_COMPATIBILITY_DATE`。
 - 兼容性结构检查会确认 Cloudflare 生成结果不再携带 Pino，并验证专用 logger
-  已落入最终项目；logger 自身的上下文合并和错误级别输出有独立单测。
+  已落入最终项目；logger 自身的上下文合并和错误级别输出有独立单测。生成结果还会
+  保持根项目的订阅事件类型，并导出支付历史所需的 `DatabaseTransaction`。
 
 ## 已完成验证
 
@@ -211,3 +212,5 @@ Node.js、Vercel 和 Docker 继续使用原部署入口。Cloudflare 文件只�
   路由切换时按 locale 重置，确保明暗模式文案使用当前语言。
 - 2026-08-15：Rate Limiting namespace 改为按 Worker 项目名稳定派生，避免生成项目间共享
   固定 namespace，并补充生成器隔离验证。
+- 2026-08-15：修复 Cloudflare logger 与数据库入口的类型契约缺失，补齐订阅事件并导出
+  `DatabaseTransaction`，生成器测试覆盖最终产物。

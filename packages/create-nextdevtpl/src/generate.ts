@@ -113,25 +113,28 @@ import { getRuntimeEnv } from "@/lib/runtime-config";
 
 import * as schema from "./schema/index";
 
-type Database = ReturnType<typeof createDatabaseConnection>;
+type HttpDatabase = ReturnType<typeof createDatabaseConnection>;
 
 function createTransactionDatabase(pool: NeonPool) {
   return drizzleNeonServerless(pool, { schema });
 }
 
 type TransactionDatabase = ReturnType<typeof createTransactionDatabase>;
-type DatabaseTransaction = Parameters<
+export type DatabaseTransaction = Parameters<
   Parameters<TransactionDatabase["transaction"]>[0]
 >[0];
+type TransactionConfig = Parameters<TransactionDatabase["transaction"]>[1];
+type Database = Omit<HttpDatabase, "transaction"> &
+  Pick<TransactionDatabase, "transaction">;
 
 function createDatabaseConnection(databaseUrl: string) {
   const sql = neon(databaseUrl);
   return drizzleNeonHttp(sql, { schema });
 }
 
-let database: Database | undefined;
+let database: HttpDatabase | undefined;
 
-function getDatabase(): Database {
+function getDatabase(): HttpDatabase {
   if (database) return database;
 
   const databaseUrl = getRuntimeEnv("DATABASE_URL");
@@ -143,6 +146,8 @@ function getDatabase(): Database {
 
 export const db = new Proxy({} as Database, {
   get(_target, property) {
+    if (property === "transaction") return withDbTransaction;
+
     const databaseInstance = getDatabase();
     const value = Reflect.get(databaseInstance, property);
     return typeof value === "function" ? value.bind(databaseInstance) : value;
@@ -150,7 +155,8 @@ export const db = new Proxy({} as Database, {
 });
 
 export async function withDbTransaction<T>(
-  callback: (tx: DatabaseTransaction) => Promise<T>
+  callback: (tx: DatabaseTransaction) => Promise<T>,
+  config?: TransactionConfig
 ): Promise<T> {
   const databaseUrl = getRuntimeEnv("DATABASE_URL");
   if (!databaseUrl) throw new Error("DATABASE_URL is required");
@@ -158,7 +164,7 @@ export async function withDbTransaction<T>(
   const pool = new NeonPool({ connectionString: databaseUrl });
   try {
     const transactionDb = createTransactionDatabase(pool);
-    return await transactionDb.transaction(callback);
+    return await transactionDb.transaction(callback, config);
   } finally {
     await pool.end();
   }

@@ -276,6 +276,9 @@ describe("project generation", () => {
     });
     expect(database).toContain('from "drizzle-orm/neon-http"');
     expect(database).toContain('from "drizzle-orm/neon-serverless"');
+    expect(database).toContain("export type DatabaseTransaction =");
+    expect(database).toContain('if (property === "transaction")');
+    expect(database).toContain("return withDbTransaction;");
     expect(database).toContain("new Proxy");
     expect(database).not.toContain('from "drizzle-orm/node-postgres"');
     expect(database).not.toContain('require("ws")');
@@ -344,6 +347,9 @@ describe("project generation", () => {
     expect(monitoring).toContain("console.error");
     expect(logger).not.toContain('from "pino"');
     expect(logger).toContain("console[CONSOLE_METHODS[level]]");
+    expect(logger).toContain('"payment.subscription.cancel_requested"');
+    expect(logger).toContain('"payment.subscription.plan_changed"');
+    expect(logger).toContain('"payment.subscription.resumed"');
     expect(await exists(join(target, "src/instrumentation.ts"))).toBe(false);
     expect(await exists(join(target, "sentry.server.config.ts"))).toBe(false);
     expect(environment).not.toContain("SENTRY_AUTH_TOKEN");
