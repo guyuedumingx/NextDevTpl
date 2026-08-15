@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildRevenueHealth, calculateMrrMinor } from "@/features/operations";
+import {
+  buildRevenueHealth,
+  calculateMrrMinor,
+  countFirstPaidUsers,
+} from "@/features/operations";
 import { PlanInterval } from "@/features/payment";
 
 describe("revenue operations metrics", () => {
@@ -46,6 +50,25 @@ describe("revenue operations metrics", () => {
     });
     expect(empty.mrrMinor.status).toBe("zero-data");
     expect(empty.confirmedRevenueMinor.status).toBe("zero-data");
+  });
+
+  it("counts first subscription payments only inside the registration cohort period", () => {
+    const period = {
+      end: new Date("2026-08-31T00:00:00.000Z"),
+      start: new Date("2026-08-01T00:00:00.000Z"),
+    };
+
+    expect(
+      countFirstPaidUsers(
+        [
+          { firstPaidAt: new Date("2026-08-15T00:00:00.000Z") },
+          { firstPaidAt: new Date("2026-07-31T23:59:59.999Z") },
+          { firstPaidAt: new Date("2026-08-31T00:00:00.000Z") },
+          { firstPaidAt: null },
+        ],
+        period
+      )
+    ).toBe(1);
   });
 
   it("keeps failed revenue sources explicit", () => {

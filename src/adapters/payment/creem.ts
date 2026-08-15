@@ -105,6 +105,7 @@ interface CreemPayment {
   amount?: number;
   currency?: string;
   customer?: CreemCustomer | string;
+  id?: string;
   metadata?: Record<string, string>;
   product?: CreemProduct | string;
   subscription?: CreemSubscription | string;
@@ -173,6 +174,7 @@ function normalizePayment(payment: CreemPayment) {
       : payment.subscription
         ? { subscriptionId: payment.subscription.id }
         : {}),
+    ...(payment.id ? { transactionId: payment.id } : {}),
   };
 }
 
@@ -285,6 +287,9 @@ export function createCreemPaymentAdapter(
             update_behavior: input.updateBehavior,
           }),
           method: "POST",
+          ...(input.requestId
+            ? { headers: { "Idempotency-Key": input.requestId } }
+            : {}),
         }
       );
       return normalizeSubscription(result);
@@ -302,6 +307,9 @@ export function createCreemPaymentAdapter(
             onExecute: "cancel",
           }),
           method: "POST",
+          ...(input.requestId
+            ? { headers: { "Idempotency-Key": input.requestId } }
+            : {}),
         }
       );
       return normalizeSubscription(result);
@@ -345,6 +353,7 @@ export function createCreemPaymentAdapter(
           ? normalizeCheckout(event.object as CreemCheckout)
           : null;
       const payment =
+        event.eventType === "payment.succeeded" ||
         event.eventType === "payment.failed" ||
         event.eventType === "payment.refunded"
           ? normalizePayment(event.object as CreemPayment)

@@ -13,6 +13,7 @@ export type PaymentWebhookType =
   | "checkout.completed"
   | "payment.failed"
   | "payment.refunded"
+  | "payment.succeeded"
   | "subscription.active"
   | "subscription.canceled"
   | "subscription.expired"
@@ -63,7 +64,9 @@ export interface PaymentTransaction {
   customerId?: string;
   metadata: Readonly<Record<string, string>>;
   productId?: string;
+  revenueKind?: "subscription_adjustment";
   subscriptionId?: string;
+  transactionId?: string;
   userId?: string;
 }
 
@@ -89,6 +92,7 @@ export type SubscriptionUpdateBehavior =
 
 export interface UpdateSubscriptionInput {
   productId: string;
+  requestId?: string;
   updateBehavior: SubscriptionUpdateBehavior;
 }
 
@@ -96,6 +100,7 @@ export type SubscriptionCancellationMode = "immediate" | "scheduled";
 
 export interface CancelSubscriptionInput {
   mode?: SubscriptionCancellationMode;
+  requestId?: string;
 }
 
 export interface VerifyPaymentWebhookInput {

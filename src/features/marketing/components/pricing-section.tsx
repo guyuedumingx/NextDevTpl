@@ -2,7 +2,7 @@
 
 import { BookOpen, Check, Coins, Layers, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
@@ -98,6 +98,9 @@ export function PricingSection({ currentPriceId }: PricingSectionProps) {
     currentPriceId ?? null
   );
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null);
+  const changeRequestRef = useRef<{ priceId: string; requestId: string } | null>(
+    null
+  );
 
   useEffect(() => {
     if (!session?.user || currentPriceId) return;
@@ -201,13 +204,22 @@ export function PricingSection({ currentPriceId }: PricingSectionProps) {
     startTransition(async () => {
       try {
         if (hasSubscription) {
+          const existingRequest = changeRequestRef.current;
+          const requestId =
+            existingRequest?.priceId === price.priceId
+              ? existingRequest.requestId
+              : crypto.randomUUID();
+          changeRequestRef.current = { priceId: price.priceId, requestId };
           const result = await changeSubscriptionPlan({
             priceId: price.priceId,
+            requestId,
           });
           if (!result?.data?.success) {
             toast.error(t("changeFailed"));
             return;
           }
+
+          changeRequestRef.current = null;
 
           toast.success(
             result.data.direction === "upgrade"

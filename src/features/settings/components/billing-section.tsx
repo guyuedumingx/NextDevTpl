@@ -13,7 +13,7 @@
 import { Loader2, Receipt, RotateCcw, Sparkles } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useAction } from "next-safe-action/hooks";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -66,6 +66,7 @@ export function BillingSection() {
   // 取消订阅
   const [isCancelling, startCancelTransition] = useTransition();
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const cancelRequestIdRef = useRef<string | null>(null);
 
   // 计算续期日期和价格
   const renewalDate = useMemo(() => {
@@ -128,7 +129,10 @@ export function BillingSection() {
   const handleCancelSubscription = () => {
     startCancelTransition(async () => {
       try {
-        await cancelSubscription();
+        const requestId = cancelRequestIdRef.current ?? crypto.randomUUID();
+        cancelRequestIdRef.current = requestId;
+        await cancelSubscription({ requestId });
+        cancelRequestIdRef.current = null;
         setCancelDialogOpen(false);
         refreshBilling();
         toast.success(t("currentPlan.cancelSuccess"));

@@ -298,12 +298,39 @@ export const createCheckoutSession = protectedAction
 
 export const changeSubscriptionPlan = protectedAction
   .metadata({ action: "payment.changeSubscriptionPlan" })
-  .schema(z.object({ priceId: z.string().min(1, "价格 ID 不能为空") }))
+  .schema(
+    z.object({
+      priceId: z.string().min(1, "价格 ID 不能为空"),
+      requestId: z.string().uuid("请求 ID 格式不正确"),
+    })
+  )
   .action(async ({ parsedInput, ctx }) => {
-    const { priceId } = parsedInput;
+    const { priceId, requestId } = parsedInput;
     const { userId } = ctx;
 
     const result = await db.transaction(async (tx) => {
+      const [previousRequest] = await tx
+        .select()
+        .from(subscriptionHistory)
+        .where(
+          and(
+            eq(subscriptionHistory.sourceType, "action"),
+            eq(subscriptionHistory.sourceEventId, requestId),
+            eq(subscriptionHistory.userId, userId)
+          )
+        )
+        .limit(1);
+      if (previousRequest) {
+        const direction = previousRequest.eventType.startsWith("upgrade")
+          ? ("upgrade" as const)
+          : ("downgrade" as const);
+        return {
+          direction,
+          effectiveAt: previousRequest.effectiveAt,
+          priceId: previousRequest.toPriceId ?? priceId,
+        };
+      }
+
       const [current] = await tx
         .select()
         .from(subscription)
@@ -332,6 +359,18 @@ export const changeSubscriptionPlan = protectedAction
       }
 
       if (current.pendingPriceId === priceId) {
+        await recordSubscriptionHistory(tx, {
+          correlationId: requestId,
+          effectiveAt:
+            current.pendingPriceEffectiveAt ?? current.currentPeriodEnd,
+          eventType: "downgrade_requested",
+          fromPriceId: current.priceId,
+          sourceEventId: requestId,
+          sourceType: "action",
+          subscriptionId: current.subscriptionId,
+          toPriceId: priceId,
+          userId,
+        });
         return {
           direction: "downgrade" as const,
           effectiveAt: current.pendingPriceEffectiveAt,
@@ -344,6 +383,7 @@ export const changeSubscriptionPlan = protectedAction
         current.subscriptionId,
         {
           productId: priceId,
+          requestId,
           updateBehavior:
             change.direction === "upgrade"
               ? "proration-charge-immediately"
@@ -387,7 +427,10 @@ export const changeSubscriptionPlan = protectedAction
       await recordSubscriptionHistory(tx, {
         effectiveAt:
           change.direction === "upgrade" ? now : current.currentPeriodEnd,
-        eventType: change.direction === "upgrade" ? "upgraded" : "downgraded",
+        eventType:
+          change.direction === "upgrade"
+            ? "upgrade_requested"
+            : "downgrade_requested",
         fromPriceId: current.priceId,
         metadata: {
           provider: paymentService.provider,
@@ -399,6 +442,9 @@ export const changeSubscriptionPlan = protectedAction
         subscriptionId: current.subscriptionId,
         toPriceId: priceId,
         userId,
+        correlationId: requestId,
+        sourceEventId: requestId,
+        sourceType: "action",
       });
 
       return {
@@ -426,10 +472,31 @@ export const changeSubscriptionPlan = protectedAction
 
 export const cancelSubscription = protectedAction
   .metadata({ action: "payment.cancelSubscription" })
-  .action(async ({ ctx }) => {
+  .schema(z.object({ requestId: z.string().uuid("请求 ID 格式不正确") }))
+  .action(async ({ parsedInput, ctx }) => {
     const { userId } = ctx;
+    const { requestId } = parsedInput;
 
     const result = await db.transaction(async (tx) => {
+      const [previousRequest] = await tx
+        .select()
+        .from(subscriptionHistory)
+        .where(
+          and(
+            eq(subscriptionHistory.sourceType, "action"),
+            eq(subscriptionHistory.sourceEventId, requestId),
+            eq(subscriptionHistory.eventType, "cancellation_requested"),
+            eq(subscriptionHistory.userId, userId)
+          )
+        )
+        .limit(1);
+      if (previousRequest) {
+        return {
+          periodEnd: previousRequest.effectiveAt,
+          subscriptionId: previousRequest.subscriptionId,
+        };
+      }
+
       const [current] = await tx
         .select()
         .from(subscription)
@@ -451,6 +518,7 @@ export const cancelSubscription = protectedAction
 
       await paymentService.cancelSubscription(current.subscriptionId, {
         mode: "scheduled",
+        requestId,
       });
 
       await tx
@@ -468,6 +536,9 @@ export const cancelSubscription = protectedAction
         effectiveAt: current.currentPeriodEnd,
         eventType: "cancellation_requested",
         fromPriceId: current.priceId,
+        correlationId: requestId,
+        sourceEventId: requestId,
+        sourceType: "action",
         subscriptionId: current.subscriptionId,
         userId,
       });

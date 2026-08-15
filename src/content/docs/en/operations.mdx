@@ -61,7 +61,7 @@ of `ready`, `zero-data`, `not-configured`, `partial`, `unauthorized`, or
 | Credit consumption | Sum of consumption transactions in the period | Database source |
 | Confirmed revenue | Sum of `payment_succeeded` `revenue_event` rows | Server-side payment data only |
 | MRR | Active plan prices, with annual price divided by 12 | Requires a matching local price configuration |
-| Paid conversion | Unique paid users / registered users in the period | No browser checkout event is used as revenue proof |
+| Paid conversion | Cohort users with a first valid subscription payment in the period / users registered in the same period | Renewals, proration adjustments, and browser checkout events are excluded from first-payment conversion |
 | Refunds | Sum and count of `refund` revenue events | Provider webhook must be processed |
 | Payment failures | Count of `payment_failed` revenue events | Used by the alert rule |
 | AI cost | Token usage multiplied by the effective model price | `estimated` when provider usage is available; `unavailable` otherwise |

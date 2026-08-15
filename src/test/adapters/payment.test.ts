@@ -122,6 +122,7 @@ describe("Creem payment adapter", () => {
 
     await adapter.updateSubscription("subscription_1", {
       productId: "price_2",
+      requestId: "request_1",
       updateBehavior: "proration-none",
     });
     await adapter.cancelSubscription("subscription_1", { mode: "scheduled" });
@@ -136,6 +137,9 @@ describe("Creem payment adapter", () => {
       product_id: "price_2",
       update_behavior: "proration-none",
     });
+    expect(new Headers(requests[0]?.init?.headers).get("Idempotency-Key")).toBe(
+      "request_1"
+    );
     expect(JSON.parse(String(requests[1]?.init?.body))).toEqual({
       mode: "scheduled",
       onExecute: "cancel",
@@ -224,6 +228,51 @@ describe("Stripe payment adapter", () => {
     });
   });
 
+  it("normalizes a paid proration invoice as a transaction-level adjustment", async () => {
+    const secret = "whsec_invoice";
+    const timestamp = Math.floor(Date.now() / 1000);
+    const payload = JSON.stringify({
+      id: "evt_invoice_1",
+      type: "invoice.payment_succeeded",
+      created: timestamp,
+      data: {
+        object: {
+          amount_paid: 425,
+          billing_reason: "subscription_update",
+          currency: "usd",
+          customer: { id: "cus_1" },
+          id: "in_1",
+          lines: { data: [{ price: { id: "price_pro_monthly" } }] },
+          metadata: { userId: "user_1" },
+          subscription: { id: "sub_1" },
+        },
+      },
+    });
+    const signature = createHmac("sha256", secret)
+      .update(`${timestamp}.${payload}`)
+      .digest("hex");
+    const adapter = createStripePaymentAdapter({ webhookSecret: secret });
+
+    await expect(
+      adapter.verifyWebhook({
+        payload,
+        signature: `t=${timestamp},v1=${signature}`,
+      })
+    ).resolves.toMatchObject({
+      id: "evt_invoice_1",
+      payment: {
+        amountMinor: 425,
+        currency: "USD",
+        productId: "price_pro_monthly",
+        revenueKind: "subscription_adjustment",
+        subscriptionId: "sub_1",
+        transactionId: "in_1",
+        userId: "user_1",
+      },
+      type: "payment.succeeded",
+    });
+  });
+
   it("updates a subscription item and supports scheduled cancel and resume", async () => {
     const requests: Array<{ url: string; init: RequestInit | undefined }> = [];
     const subscription = {
@@ -246,6 +295,7 @@ describe("Stripe payment adapter", () => {
 
     await adapter.updateSubscription("sub_1", {
       productId: "price_2",
+      requestId: "request_2",
       updateBehavior: "proration-charge-immediately",
     });
     await adapter.cancelSubscription("sub_1", { mode: "scheduled" });
@@ -261,6 +311,9 @@ describe("Stripe payment adapter", () => {
     expect(updateForm.get("items[0][id]")).toBe("si_1");
     expect(updateForm.get("items[0][price]")).toBe("price_2");
     expect(updateForm.get("proration_behavior")).toBe("always_invoice");
+    expect(new Headers(requests[1]?.init?.headers).get("Idempotency-Key")).toBe(
+      "request_2"
+    );
     expect(
       new URLSearchParams(String(requests[2]?.init?.body)).get(
         "cancel_at_period_end"

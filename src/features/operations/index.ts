@@ -35,6 +35,7 @@ export {
   buildRevenueHealth,
   calculateMrrMinor,
   countMetric,
+  countFirstPaidUsers,
 } from "./revenue";
 export {
   createOperationsDailySnapshot,

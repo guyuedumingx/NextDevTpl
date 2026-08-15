@@ -91,6 +91,22 @@ SELECT
 	) AS has_pending_price_id,
 	to_regclass('public.subscription_history') IS NOT NULL AS has_subscription_history,
 	to_regclass('public.subscription_checkout') IS NOT NULL AS has_subscription_checkout,
+	(
+		to_regclass('public.revenue_event') IS NOT NULL AND EXISTS (
+			SELECT 1
+			FROM information_schema.columns
+			WHERE table_name = 'revenue_event'
+			  AND column_name = 'transaction_id'
+		)
+	) AS has_revenue_transaction_id,
+	(
+		to_regclass('public.subscription_history') IS NULL OR (
+			SELECT COUNT(*)
+			FROM information_schema.columns
+			WHERE table_name = 'subscription_history'
+			  AND column_name IN ('source_type', 'correlation_id')
+		) = 2
+	) AS has_subscription_history_audit_columns,
 	EXISTS (
 		SELECT 1
 		FROM pg_indexes
@@ -109,6 +125,8 @@ SELECT
         has_pending_price_id?: boolean;
         has_subscription_history?: boolean;
         has_subscription_checkout?: boolean;
+        has_revenue_transaction_id?: boolean;
+        has_subscription_history_audit_columns?: boolean;
         has_subscription_user_unique?: boolean;
       }
     | undefined;
@@ -121,6 +139,8 @@ SELECT
     readinessRow.has_pending_price_id &&
     readinessRow.has_subscription_history &&
     readinessRow.has_subscription_checkout &&
+    readinessRow.has_revenue_transaction_id &&
+    readinessRow.has_subscription_history_audit_columns &&
     readinessRow.has_subscription_user_unique
   ) {
     legacySchemaSynced = true;
@@ -261,7 +281,9 @@ CREATE TABLE IF NOT EXISTS "subscription_history" (
 	"from_price_id" text,
 	"to_price_id" text,
 	"effective_at" timestamp NOT NULL,
+	"source_type" text DEFAULT 'webhook' NOT NULL,
 	"source_event_id" text,
+	"correlation_id" text,
 	"metadata" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "subscription_history_user_id_user_id_fk"
@@ -272,8 +294,22 @@ CREATE INDEX IF NOT EXISTS "subscription_history_user_created_idx"
 ON "subscription_history" ("user_id", "created_at");
 CREATE INDEX IF NOT EXISTS "subscription_history_subscription_idx"
 ON "subscription_history" ("subscription_id");
+ALTER TABLE "subscription_history"
+ADD COLUMN IF NOT EXISTS "source_type" text DEFAULT 'webhook';
+ALTER TABLE "subscription_history"
+ADD COLUMN IF NOT EXISTS "correlation_id" text;
+UPDATE "subscription_history"
+SET "source_type" = 'webhook'
+WHERE "source_type" IS NULL;
+ALTER TABLE "subscription_history"
+ALTER COLUMN "source_type" SET DEFAULT 'webhook';
+ALTER TABLE "subscription_history"
+ALTER COLUMN "source_type" SET NOT NULL;
+DROP INDEX IF EXISTS "subscription_history_source_event_unique";
 CREATE UNIQUE INDEX IF NOT EXISTS "subscription_history_source_event_unique"
-ON "subscription_history" ("source_event_id");
+ON "subscription_history" ("source_type", "source_event_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "subscription_history_correlation_event_unique"
+ON "subscription_history" ("event_type", "correlation_id");
 
 CREATE TABLE IF NOT EXISTS "subscription_checkout" (
 	"id" text PRIMARY KEY NOT NULL,
@@ -298,6 +334,31 @@ CREATE UNIQUE INDEX IF NOT EXISTS "subscription_checkout_checkout_unique"
 ON "subscription_checkout" ("checkout_id");
 CREATE INDEX IF NOT EXISTS "subscription_checkout_expires_idx"
 ON "subscription_checkout" ("expires_at");
+
+CREATE TABLE IF NOT EXISTS "revenue_event" (
+	"id" text PRIMARY KEY NOT NULL,
+	"external_event_id" text NOT NULL,
+	"provider" text NOT NULL,
+	"kind" text NOT NULL,
+	"user_id" text,
+	"subscription_id" text,
+	"price_id" text,
+	"currency" text NOT NULL,
+	"amount_minor" integer NOT NULL,
+	"interval" text,
+	"occurred_at" timestamp NOT NULL,
+	"metadata" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "revenue_event_user_id_user_id_fk"
+		FOREIGN KEY ("user_id") REFERENCES "public"."user"("id")
+		ON DELETE set null ON UPDATE no action
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "revenue_event_external_kind_unique"
+ON "revenue_event" ("external_event_id", "kind");
+ALTER TABLE IF EXISTS "revenue_event"
+ADD COLUMN IF NOT EXISTS "transaction_id" text;
+CREATE UNIQUE INDEX IF NOT EXISTS "revenue_event_transaction_kind_unique"
+ON "revenue_event" ("transaction_id", "kind");
 `)
     );
   });

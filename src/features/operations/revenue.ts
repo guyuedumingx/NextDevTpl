@@ -28,6 +28,18 @@ export function countMetric(
   return metric(value, value > 0 ? "ready" : "zero-data", source);
 }
 
+export function countFirstPaidUsers(
+  rows: ReadonlyArray<{ firstPaidAt: Date | null }>,
+  period: { start: Date; end: Date }
+): number {
+  return rows.filter(
+    (row) =>
+      row.firstPaidAt !== null &&
+      row.firstPaidAt >= period.start &&
+      row.firstPaidAt < period.end
+  ).length;
+}
+
 export function buildRevenueHealth(input: {
   activeMrrMinor: number;
   confirmedRevenueMinor: number;
@@ -35,6 +47,7 @@ export function buildRevenueHealth(input: {
   currency: string;
   churnedSubscriptions: number;
   paidUsers: number;
+  paidUsersStatus?: MetricStatus;
   paymentFailures: number;
   refundsMinor: number;
   refundEvents: number;
@@ -49,7 +62,9 @@ export function buildRevenueHealth(input: {
   const revenueFailed = input.revenueStatus === "query-failed";
   const mrrFailed = input.activeMrrStatus === "query-failed";
   const conversionFailed =
-    revenueFailed || input.registeredUsersStatus === "query-failed";
+    revenueFailed ||
+    input.paidUsersStatus === "query-failed" ||
+    input.registeredUsersStatus === "query-failed";
   const failed = (source: string, message: string) =>
     metric<number>(null, "query-failed", source, message);
 

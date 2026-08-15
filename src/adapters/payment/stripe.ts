@@ -51,7 +51,8 @@ interface StripeWebhookEvent {
       | StripeCheckout
       | StripeSubscription
       | StripePaymentIntent
-      | StripeCharge;
+      | StripeCharge
+      | StripeInvoice;
   };
   id: string;
   type: string;
@@ -61,6 +62,7 @@ interface StripePaymentIntent {
   amount: number;
   currency: string;
   customer?: string | null;
+  id: string;
   metadata?: Record<string, string>;
   subscription?: string | null;
 }
@@ -69,8 +71,20 @@ interface StripeCharge {
   amount: number;
   currency: string;
   customer?: string | null;
+  id: string;
   metadata?: Record<string, string>;
   subscription?: string | null;
+}
+
+interface StripeInvoice {
+  amount_paid: number;
+  billing_reason?: string | null;
+  currency: string;
+  customer?: string | { id: string } | null;
+  id: string;
+  lines?: { data: Array<{ price?: { id: string } | null }> };
+  metadata?: Record<string, string>;
+  subscription?: string | { id: string } | null;
 }
 
 function formBody(values: Record<string, string | undefined>): string {
@@ -106,6 +120,33 @@ function mapPayment(
     ...(value.customer ? { customerId: value.customer } : {}),
     metadata: value.metadata ?? {},
     ...(value.subscription ? { subscriptionId: value.subscription } : {}),
+    transactionId: value.id,
+  };
+}
+
+function mapInvoice(value: StripeInvoice): PaymentTransaction {
+  const customerId =
+    typeof value.customer === "string"
+      ? value.customer
+      : (value.customer?.id ?? undefined);
+  const subscriptionId =
+    typeof value.subscription === "string"
+      ? value.subscription
+      : (value.subscription?.id ?? undefined);
+  const productId = value.lines?.data[0]?.price?.id;
+
+  return {
+    amountMinor: value.amount_paid,
+    currency: value.currency.toUpperCase(),
+    ...(customerId ? { customerId } : {}),
+    metadata: value.metadata ?? {},
+    ...(productId ? { productId } : {}),
+    ...(subscriptionId ? { subscriptionId } : {}),
+    ...(value.billing_reason === "subscription_update"
+      ? { revenueKind: "subscription_adjustment" as const }
+      : {}),
+    transactionId: value.id,
+    ...(value.metadata?.userId ? { userId: value.metadata.userId } : {}),
   };
 }
 
@@ -150,6 +191,8 @@ function mapWebhookType(event: StripeWebhookEvent): PaymentWebhookType {
       return "payment.failed";
     case "charge.refunded":
       return "payment.refunded";
+    case "invoice.payment_succeeded":
+      return "payment.succeeded";
     case "customer.subscription.created":
       return "subscription.active";
     case "customer.subscription.deleted":
@@ -321,6 +364,9 @@ export function createStripePaymentAdapter(
               proration_behavior: prorationBehavior,
             }),
             method: "POST",
+            ...(input.requestId
+              ? { headers: { "Idempotency-Key": input.requestId } }
+              : {}),
           }
         )
       );
@@ -334,7 +380,12 @@ export function createStripePaymentAdapter(
         return mapSubscription(
           await stripeRequest<StripeSubscription>(
             `/subscriptions/${encodeURIComponent(id)}`,
-            { method: "DELETE" }
+            {
+              method: "DELETE",
+              ...(input.requestId
+                ? { headers: { "Idempotency-Key": input.requestId } }
+                : {}),
+            }
           )
         );
       }
@@ -345,6 +396,9 @@ export function createStripePaymentAdapter(
           {
             body: formBody({ cancel_at_period_end: "true" }),
             method: "POST",
+            ...(input.requestId
+              ? { headers: { "Idempotency-Key": input.requestId } }
+              : {}),
           }
         )
       );
@@ -403,11 +457,13 @@ export function createStripePaymentAdapter(
           ? mapCheckout(event.data.object as StripeCheckout)
           : null;
       const payment =
-        type === "payment.failed"
-          ? mapPayment(event.data.object as unknown as StripePaymentIntent)
-          : type === "payment.refunded"
-            ? mapPayment(event.data.object as unknown as StripeCharge)
-            : null;
+        type === "payment.succeeded"
+          ? mapInvoice(event.data.object as StripeInvoice)
+          : type === "payment.failed"
+            ? mapPayment(event.data.object as unknown as StripePaymentIntent)
+            : type === "payment.refunded"
+              ? mapPayment(event.data.object as unknown as StripeCharge)
+              : null;
       const subscription =
         type === "checkout.completed" || payment
           ? (checkout?.subscription ?? null)

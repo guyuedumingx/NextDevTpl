@@ -1,4 +1,4 @@
-import { and, eq, lt } from "drizzle-orm";
+import { and, desc, eq, inArray, lt } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -16,7 +16,11 @@ import { db } from "@/db";
 import { user } from "@/db/schema/auth";
 import { creditsBatch } from "@/db/schema/credits";
 import { paymentWebhookEvent } from "@/db/schema/payment";
-import { subscription, subscriptionCheckout } from "@/db/schema/subscription";
+import {
+  subscription,
+  subscriptionCheckout,
+  subscriptionHistory,
+} from "@/db/schema/subscription";
 import {
   CREDIT_PACKAGES,
   CREDITS_EXPIRY_DAYS,
@@ -196,6 +200,34 @@ async function handlePaymentEvent(event: PaymentWebhookEvent): Promise<void> {
           ? { userId: event.payment?.userId ?? event.payment?.metadata.userId }
           : {}),
       });
+      return;
+    case "payment.succeeded":
+      if (
+        event.payment?.revenueKind === "subscription_adjustment" &&
+        event.payment.transactionId &&
+        event.payment.subscriptionId
+      ) {
+        const userId =
+          event.payment.userId ??
+          event.payment.metadata.userId ??
+          (await findSubscriptionUserId(event.payment.subscriptionId));
+        await recordRevenueEvent({
+          amountMinor: event.payment.amountMinor,
+          externalEventId: event.id,
+          kind: "subscription_adjustment",
+          occurredAt: event.createdAt,
+          provider: paymentService.provider,
+          subscriptionId: event.payment.subscriptionId,
+          transactionId: event.payment.transactionId,
+          ...(event.payment.currency
+            ? { currency: event.payment.currency }
+            : {}),
+          ...(event.payment.productId
+            ? { priceId: event.payment.productId }
+            : {}),
+          ...(userId ? { userId } : {}),
+        });
+      }
       return;
   }
 }
@@ -551,6 +583,29 @@ async function handleSubscriptionCanceled(
 
     if (!current) return;
     userId = current.userId;
+    const [latestCancellationAction] = await tx
+      .select({
+        correlationId: subscriptionHistory.correlationId,
+        eventType: subscriptionHistory.eventType,
+      })
+      .from(subscriptionHistory)
+      .where(
+        and(
+          eq(subscriptionHistory.subscriptionId, current.subscriptionId),
+          eq(subscriptionHistory.sourceType, "action"),
+          inArray(subscriptionHistory.eventType, [
+            "cancellation_requested",
+            "cancellation_resumed",
+          ])
+        )
+      )
+      .orderBy(desc(subscriptionHistory.createdAt))
+      .limit(1);
+    const requestedCancellation =
+      latestCancellationAction?.eventType === "cancellation_requested"
+        ? latestCancellationAction
+        : undefined;
+
     await tx
       .update(subscription)
       .set({
@@ -564,14 +619,20 @@ async function handleSubscriptionCanceled(
       })
       .where(eq(subscription.id, current.id));
 
-    await recordSubscriptionHistory(tx, {
-      effectiveAt: periodEnd ?? occurredAt,
-      eventType: isStillInPeriod ? "cancellation_requested" : "canceled",
-      fromPriceId: current.priceId,
-      sourceEventId: eventId,
-      subscriptionId: current.subscriptionId,
-      userId: current.userId,
-    });
+    if (!isStillInPeriod || !requestedCancellation) {
+      await recordSubscriptionHistory(tx, {
+        effectiveAt: periodEnd ?? occurredAt,
+        eventType: isStillInPeriod ? "cancellation_requested" : "canceled",
+        fromPriceId: current.priceId,
+        sourceEventId: eventId,
+        sourceType: "webhook",
+        subscriptionId: current.subscriptionId,
+        userId: current.userId,
+        ...(requestedCancellation?.correlationId
+          ? { correlationId: requestedCancellation.correlationId }
+          : {}),
+      });
+    }
   });
 
   await recordRevenueEvent({
@@ -702,6 +763,7 @@ async function createOrUpdateSubscription(
         effectiveAt: externalSubscription.currentPeriodStart ?? new Date(),
         eventType: "created",
         sourceEventId: eventId,
+        sourceType: "webhook",
         subscriptionId: externalSubscription.id,
         toPriceId: externalSubscription.productId,
         userId,
@@ -718,6 +780,25 @@ async function createOrUpdateSubscription(
       pendingPriceEffectiveAt: existing.pendingPriceEffectiveAt,
       pendingPriceId: existing.pendingPriceId,
     });
+
+    const [requestedChange] = await tx
+      .select()
+      .from(subscriptionHistory)
+      .where(
+        and(
+          eq(subscriptionHistory.subscriptionId, externalSubscription.id),
+          eq(subscriptionHistory.sourceType, "action"),
+          inArray(subscriptionHistory.eventType, [
+            "upgrade_requested",
+            "downgrade_requested",
+          ]),
+          eq(subscriptionHistory.toPriceId, externalSubscription.productId)
+        )
+      )
+      .orderBy(desc(subscriptionHistory.createdAt))
+      .limit(1);
+    const requestedCorrelationId =
+      requestedChange?.correlationId ?? requestedChange?.sourceEventId;
 
     await tx
       .update(subscription)
@@ -737,11 +818,42 @@ async function createOrUpdateSubscription(
     if (existing.priceId !== resolved.priceId) {
       await recordSubscriptionHistory(tx, {
         effectiveAt: externalSubscription.currentPeriodStart ?? new Date(),
-        eventType: resolved.appliedPendingPrice ? "downgraded" : "changed",
+        eventType: requestedChange
+          ? requestedChange.eventType === "upgrade_requested"
+            ? "upgrade_confirmed"
+            : "downgrade_confirmed"
+          : resolved.appliedPendingPrice
+            ? "downgraded"
+            : "changed",
         fromPriceId: existing.priceId,
         sourceEventId: eventId,
+        sourceType: "webhook",
         subscriptionId: externalSubscription.id,
         toPriceId: resolved.priceId,
+        userId,
+        ...(requestedCorrelationId
+          ? {
+              correlationId: requestedCorrelationId,
+            }
+          : {}),
+      });
+    } else if (requestedChange && requestedCorrelationId) {
+      await recordSubscriptionHistory(tx, {
+        correlationId: requestedCorrelationId,
+        effectiveAt:
+          requestedChange.eventType === "downgrade_requested"
+            ? requestedChange.effectiveAt
+            : (externalSubscription.currentPeriodStart ??
+              requestedChange.effectiveAt),
+        eventType:
+          requestedChange.eventType === "upgrade_requested"
+            ? "upgrade_confirmed"
+            : "downgrade_confirmed",
+        fromPriceId: existing.priceId,
+        sourceEventId: eventId,
+        sourceType: "webhook",
+        subscriptionId: externalSubscription.id,
+        toPriceId: requestedChange.toPriceId ?? resolved.priceId,
         userId,
       });
     } else if (
@@ -753,6 +865,7 @@ async function createOrUpdateSubscription(
         effectiveAt: externalSubscription.currentPeriodStart,
         eventType: "renewed",
         sourceEventId: eventId,
+        sourceType: "webhook",
         subscriptionId: externalSubscription.id,
         toPriceId: resolved.priceId,
         userId,

@@ -1,4 +1,4 @@
-import { and, count, eq, gte, lt, sum } from "drizzle-orm";
+import { and, count, eq, gte, isNotNull, lt, min, sum } from "drizzle-orm";
 
 import { findPlanByPriceId, paymentConfig } from "@/config/payment";
 import type { AIUsageStatus } from "@/core/services";
@@ -22,7 +22,11 @@ import {
   metric,
   ratioMetric,
 } from "./metrics";
-import { buildRevenueHealth, calculateMrrMinor } from "./revenue";
+import {
+  buildRevenueHealth,
+  calculateMrrMinor,
+  countFirstPaidUsers,
+} from "./revenue";
 import type { MetricState, OperationsDashboard } from "./types";
 
 export interface OperationsPeriodOptions {
@@ -222,6 +226,7 @@ export async function getOperationsDashboard(
     openTickets,
     creditTotal,
     newUsers,
+    firstPaidUsers,
     creditConsumption,
     supportTickets,
     activeSubscriptionRows,
@@ -253,6 +258,21 @@ export async function getOperationsDashboard(
         .where(
           and(gte(user.createdAt, period.start), lt(user.createdAt, period.end))
         )
+    ),
+    settleQuery(() =>
+      db
+        .select({ firstPaidAt: min(revenueEvent.occurredAt) })
+        .from(revenueEvent)
+        .innerJoin(user, eq(revenueEvent.userId, user.id))
+        .where(
+          and(
+            eq(revenueEvent.kind, "payment_succeeded"),
+            isNotNull(revenueEvent.subscriptionId),
+            gte(user.createdAt, period.start),
+            lt(user.createdAt, period.end)
+          )
+        )
+        .groupBy(revenueEvent.userId)
     ),
     settleQuery(() =>
       db
@@ -337,6 +357,9 @@ export async function getOperationsDashboard(
     ? Number(creditTotal.value[0]?.value ?? 0)
     : 0;
   const newUsersValue = newUsers.ok ? Number(newUsers.value[0]?.value ?? 0) : 0;
+  const firstPaidUsersValue = firstPaidUsers.ok
+    ? countFirstPaidUsers(firstPaidUsers.value, period)
+    : 0;
   const creditConsumptionValue = creditConsumption.ok
     ? Number(creditConsumption.value[0]?.value ?? 0)
     : 0;
@@ -357,11 +380,10 @@ export async function getOperationsDashboard(
       : total;
   }, 0);
   const succeededRevenue = revenueRowsValue.filter(
-    (event) => event.kind === "payment_succeeded"
+    (event) =>
+      event.kind === "payment_succeeded" ||
+      event.kind === "subscription_adjustment"
   );
-  const paidUsers = new Set(
-    succeededRevenue.flatMap((event) => (event.userId ? [event.userId] : []))
-  ).size;
   const confirmedRevenueMinor = succeededRevenue.reduce(
     (total, event) => total + event.amountMinor,
     0
@@ -496,9 +518,11 @@ export async function getOperationsDashboard(
   const dashboard: OperationsDashboard = {
     ai,
     funnel: createFunnel({
-      paidUsers,
+      paidUsers: firstPaidUsersValue,
       registeredUsers: newUsersValue,
-      ...(revenueRows.ok ? {} : { paidUsersStatus: "query-failed" as const }),
+      ...(firstPaidUsers.ok
+        ? {}
+        : { paidUsersStatus: "query-failed" as const }),
       ...(newUsers.ok
         ? {}
         : { registeredUsersStatus: "query-failed" as const }),
@@ -544,12 +568,12 @@ export async function getOperationsDashboard(
       churnedSubscriptions: revenueRowsValue.filter(
         (event) => event.kind === "subscription_canceled"
       ).length,
-      paidUsers,
       paymentFailures: revenueRowsValue.filter(
         (event) => event.kind === "payment_failed"
       ).length,
       refundsMinor,
       refundEvents: refunds.length,
+      paidUsers: firstPaidUsersValue,
       registeredUsers: newUsersValue,
       ...(activeSubscriptionRows.ok
         ? {}
@@ -558,6 +582,9 @@ export async function getOperationsDashboard(
         ? {}
         : { registeredUsersStatus: "query-failed" as const }),
       ...(revenueRows.ok ? {} : { revenueStatus: "query-failed" as const }),
+      ...(firstPaidUsers.ok
+        ? {}
+        : { paidUsersStatus: "query-failed" as const }),
     }),
     retention: createRetention(),
     usage: {

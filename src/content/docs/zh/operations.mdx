@@ -57,7 +57,7 @@ pnpm dlx create-nextdevtpl@latest my-ops \
 | 积分消费 | 周期内 consumption 交易总和 | 数据库来源 |
 | 确认收入 | 周期内 `payment_succeeded` 收入事件金额总和 | 只使用服务端支付数据 |
 | MRR | 活跃套餐价格；年付价格除以 12 | 必须能匹配本地价格配置 |
-| 付费转化率 | 周期内去重付费用户 / 注册用户 | 浏览器 checkout 事件不作为收入依据 |
+| 付费转化率 | 同一注册 cohort 在周期内首次有效订阅支付的用户 / 周期内注册用户 | 续费、补差价和浏览器 checkout 事件不作为首次付费依据 |
 | 退款 | `refund` 收入事件金额和次数 | 依赖支付 Webhook 已处理 |
 | 支付失败 | `payment_failed` 收入事件次数 | 用于告警规则 |
 | AI 成本 | Token 用量乘以生效中的模型价格 | 有用量时为估算，无价格或 Token 时为不可用 |

@@ -27,6 +27,7 @@ export const revenueEvent = pgTable(
     kind: text("kind").notNull(),
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     subscriptionId: text("subscription_id"),
+    transactionId: text("transaction_id"),
     priceId: text("price_id"),
     currency: text("currency").notNull(),
     amountMinor: integer("amount_minor").notNull(),
@@ -38,6 +39,10 @@ export const revenueEvent = pgTable(
   (table) => [
     uniqueIndex("revenue_event_external_kind_unique").on(
       table.externalEventId,
+      table.kind
+    ),
+    uniqueIndex("revenue_event_transaction_kind_unique").on(
+      table.transactionId,
       table.kind
     ),
   ]

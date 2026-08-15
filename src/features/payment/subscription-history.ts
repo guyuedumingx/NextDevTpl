@@ -8,17 +8,24 @@ export type SubscriptionHistoryEventType =
   | "created"
   | "upgraded"
   | "downgraded"
+  | "upgrade_requested"
+  | "upgrade_confirmed"
+  | "downgrade_requested"
+  | "downgrade_confirmed"
   | "cancellation_requested"
   | "cancellation_resumed"
   | "canceled"
   | "renewed"
   | "changed";
 
+export type SubscriptionHistorySourceType = "action" | "system" | "webhook";
+
 export type RecordSubscriptionHistoryInput = Omit<
   NewSubscriptionHistory,
-  "id"
+  "id" | "sourceType"
 > & {
   eventType: SubscriptionHistoryEventType;
+  sourceType?: SubscriptionHistorySourceType;
 };
 
 export async function recordSubscriptionHistory(
@@ -27,6 +34,10 @@ export async function recordSubscriptionHistory(
 ): Promise<void> {
   await tx
     .insert(subscriptionHistory)
-    .values({ id: crypto.randomUUID(), ...input })
+    .values({
+      id: crypto.randomUUID(),
+      sourceType: input.sourceType ?? "webhook",
+      ...input,
+    })
     .onConflictDoNothing();
 }

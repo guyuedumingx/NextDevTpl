@@ -43,7 +43,9 @@ export const subscriptionHistory = pgTable(
     fromPriceId: text("from_price_id"),
     toPriceId: text("to_price_id"),
     effectiveAt: timestamp("effective_at").notNull(),
+    sourceType: text("source_type").notNull().default("webhook"),
     sourceEventId: text("source_event_id"),
+    correlationId: text("correlation_id"),
     metadata: jsonb("metadata").$type<Record<string, string>>(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
@@ -54,7 +56,12 @@ export const subscriptionHistory = pgTable(
     ),
     index("subscription_history_subscription_idx").on(table.subscriptionId),
     uniqueIndex("subscription_history_source_event_unique").on(
+      table.sourceType,
       table.sourceEventId
+    ),
+    uniqueIndex("subscription_history_correlation_event_unique").on(
+      table.eventType,
+      table.correlationId
     ),
   ]
 );

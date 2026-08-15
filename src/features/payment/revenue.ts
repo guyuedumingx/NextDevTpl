@@ -7,6 +7,7 @@ export type RevenueEventKind =
   | "payment_failed"
   | "payment_succeeded"
   | "refund"
+  | "subscription_adjustment"
   | "subscription_canceled";
 
 export interface RecordRevenueEventInput {
@@ -19,6 +20,7 @@ export interface RecordRevenueEventInput {
   priceId?: string;
   provider: PaymentProvider;
   subscriptionId?: string;
+  transactionId?: string;
   userId?: string;
   interval?: string;
 }
@@ -31,6 +33,16 @@ function toMinorUnits(amountMajor: number | undefined): number {
 export async function recordRevenueEvent(
   input: RecordRevenueEventInput
 ): Promise<void> {
+  if (
+    input.kind === "subscription_adjustment" &&
+    (input.amountMinor === undefined ||
+      !input.subscriptionId ||
+      !input.transactionId)
+  ) {
+    throw new Error(
+      "Subscription adjustments require a transaction, amount, and subscription"
+    );
+  }
   const price = input.priceId ? findPlanByPriceId(input.priceId).price : null;
   const amountMajor = input.amountMajor ?? price?.amount;
   const amountMinor =
@@ -39,12 +51,13 @@ export async function recordRevenueEvent(
   await db
     .insert(revenueEvent)
     .values({
-      id: `${input.externalEventId}:${input.kind}`,
+      id: `${input.provider}:${input.transactionId ?? input.externalEventId}:${input.kind}`,
       externalEventId: input.externalEventId,
       provider: input.provider,
       kind: input.kind,
       ...(input.userId ? { userId: input.userId } : {}),
       ...(input.subscriptionId ? { subscriptionId: input.subscriptionId } : {}),
+      ...(input.transactionId ? { transactionId: input.transactionId } : {}),
       ...(input.priceId ? { priceId: input.priceId } : {}),
       currency: input.currency ?? paymentConfig.currency,
       amountMinor,
