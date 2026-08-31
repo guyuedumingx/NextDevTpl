@@ -10,7 +10,7 @@
 ## 快速开始
 
 ```bash
-pnpm dlx create-nextdevtpl@2.6.0 my-app --preset saas --target vercel
+pnpm dlx create-nextdevtpl@3.0.0 my-app --preset saas --target vercel
 ```
 
 ## 预设、目标和服务
@@ -25,7 +25,7 @@ pnpm dlx create-nextdevtpl@2.6.0 my-app --preset saas --target vercel
 省略 `--preset` 时，`server` 目标默认生成 `minimal`。需要自定义模块或覆盖服务时使用 `custom`：
 
 ```bash
-pnpm dlx create-nextdevtpl@2.6.0 my-app \
+pnpm dlx create-nextdevtpl@3.0.0 my-app \
   --preset custom \
   --modules auth,analytics,operations \
   --target docker \
@@ -44,7 +44,7 @@ pnpm dlx create-nextdevtpl@2.6.0 my-app \
 `nextdevtpl.generated.json`。保留该清单，后续升级时用它还原相同组合并比较差异。
 
 ```bash
-pnpm dlx create-nextdevtpl@2.6.0 --help
+pnpm dlx create-nextdevtpl@3.0.0 --help
 ```
 
 ## 文档

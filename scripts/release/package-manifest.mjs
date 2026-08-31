@@ -6,6 +6,7 @@ const REQUIRED_FILES = [
   "dist/index.js",
   "package.json",
   "template/manifest.json",
+  "template/README.md",
   "template/README.en.md",
   "template/package.json",
   "template/pnpm-lock.yaml",

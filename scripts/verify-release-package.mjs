@@ -11,7 +11,7 @@ const packageJson = JSON.parse(
   await readFile(resolve(packageRoot, "package.json"), "utf8")
 );
 const roadmap = await readFile(
-  resolve(repositoryRoot, "docs", "roadmap2.x.md"),
+  resolve(repositoryRoot, "docs", "roadmap3.x.md"),
   "utf8"
 );
 const packArguments = ["pack", "--dry-run", "--ignore-scripts", "--json"];

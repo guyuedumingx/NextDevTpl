@@ -13,6 +13,7 @@ const requiredFiles = [
   "dist/index.js",
   "package.json",
   "template/manifest.json",
+  "template/README.md",
   "template/README.en.md",
   "template/package.json",
   "template/pnpm-lock.yaml",
@@ -21,14 +22,14 @@ const requiredFiles = [
 
 const packageJson = {
   name: "create-nextdevtpl",
-  version: "2.6.0",
+  version: "3.0.0",
   publishConfig: { access: "public" },
 };
-const roadmap = "# Roadmap\n\n> 当前版本：`v2.6.0`\n";
+const roadmap = "# Roadmap\n\n> 当前版本：`v3.0.0`\n";
 
 describe("release package manifest", () => {
   it("reads the current roadmap version", () => {
-    expect(readRoadmapVersion(roadmap)).toBe("2.6.0");
+    expect(readRoadmapVersion(roadmap)).toBe("3.0.0");
   });
 
   it("accepts a complete public package", () => {
@@ -37,7 +38,7 @@ describe("release package manifest", () => {
     ).toEqual({
       fileCount: requiredFiles.length,
       name: "create-nextdevtpl",
-      version: "2.6.0",
+      version: "3.0.0",
     });
   });
 
@@ -48,6 +49,6 @@ describe("release package manifest", () => {
         packageJson: { ...packageJson, version: "2.5.0" },
         roadmap,
       })
-    ).toThrowError(/does not match roadmap 2\.6\.0[\s\S]*\.env\.local/);
+    ).toThrowError(/does not match roadmap 3\.0\.0[\s\S]*\.env\.local/);
   });
 });
