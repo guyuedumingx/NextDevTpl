@@ -1,5 +1,6 @@
 import { render, toPlainText } from "@react-email/render";
 import type { ReactElement } from "react";
+import { brandConfig } from "@/config/brand";
 
 import type { MailAddress } from "@/core/services";
 import { logError } from "@/lib/logger";
@@ -7,7 +8,7 @@ import { redactText } from "@/lib/redaction";
 import { mailService } from "@/services/mail";
 
 export const DEFAULT_FROM_EMAIL =
-  process.env.EMAIL_FROM ?? "NextDevTpl <noreply@example.com>";
+  process.env.EMAIL_FROM ?? `${brandConfig.name} <noreply@example.com>`;
 
 /**
  * 邮件发送工具
@@ -133,7 +134,7 @@ function logEmailPreview(params: SendEmailParams): void {
  * // 发送欢迎邮件
  * await sendEmail({
  *   to: "user@example.com",
- *   subject: "Welcome to NextDevTpl!",
+ *   subject: "Welcome to QuickStarter!",
  *   react: <WelcomeEmail name="John" dashboardUrl="..." />,
  * });
  *

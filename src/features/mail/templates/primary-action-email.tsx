@@ -12,6 +12,7 @@ import {
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
 import type { ReactNode } from "react";
+import { brandConfig } from "@/config/brand";
 
 /**
  * 通用操作邮件模板
@@ -56,7 +57,7 @@ export function PrimaryActionEmail({
             {/* Logo / 品牌区域 */}
             <Section className="mb-8 text-center">
               <Heading className="m-0 text-2xl font-bold text-gray-900">
-                NextDevTpl
+                {brandConfig.name}
               </Heading>
             </Section>
 
@@ -67,7 +68,7 @@ export function PrimaryActionEmail({
             <Section className="mb-6 text-center">
               <Button
                 href={actionUrl}
-                className="inline-block rounded-md bg-violet-600 px-6 py-3 text-center text-sm font-semibold text-white no-underline"
+                className="inline-block rounded-md bg-teal-800 px-6 py-3 text-center text-sm font-semibold text-white no-underline"
               >
                 {actionLabel}
               </Button>
@@ -86,7 +87,7 @@ export function PrimaryActionEmail({
                 If the button above doesn&apos;t work, copy and paste this URL
                 into your browser:
               </Text>
-              <Text className="m-0 break-all text-xs text-violet-600">
+              <Text className="m-0 break-all text-xs text-teal-800">
                 {actionUrl}
               </Text>
             </Section>
@@ -100,7 +101,8 @@ export function PrimaryActionEmail({
 
             {/* 页脚 */}
             <Text className="m-0 mt-4 text-center text-xs text-gray-400">
-              © {new Date().getFullYear()} NextDevTpl. All rights reserved.
+              © {new Date().getFullYear()} {brandConfig.name}. All rights
+              reserved.
             </Text>
           </Container>
         </Body>
@@ -130,13 +132,13 @@ export function MagicLinkEmail({
 }) {
   return (
     <PrimaryActionEmail
-      preview="Sign in to NextDevTpl with this magic link"
+      preview={`Sign in to ${brandConfig.name} with this magic link`}
       actionLabel="Sign In"
       actionUrl={magicLinkUrl}
       expiresIn="15 minutes"
     >
       <Heading className="mb-4 text-xl font-semibold text-gray-900">
-        Sign in to NextDevTpl
+        Sign in to {brandConfig.name}
       </Heading>
       <Text className="mb-4 text-base leading-relaxed text-gray-600">
         Click the button below to sign in to your account ({email}). No password
@@ -158,7 +160,7 @@ export function ResetPasswordEmail({
 }) {
   return (
     <PrimaryActionEmail
-      preview="Reset your NextDevTpl password"
+      preview={`Reset your ${brandConfig.name} password`}
       actionLabel="Reset Password"
       actionUrl={resetUrl}
       expiresIn="1 hour"

@@ -1,11 +1,11 @@
 ---
 title: Upgrade and Compatibility
-description: Merge a newer NextDevTpl release safely and diagnose combination checks.
+description: Merge a newer QuickStarter release safely and diagnose combination checks.
 ---
 
 # Upgrade and Compatibility
 
-A generated app is an independent source tree. NextDevTpl 3.x does not
+A generated app is an independent source tree. QuickStarter 3.x does not
 overwrite existing projects. Upgrades recreate the same selection in a
 comparison directory, review its diff, and merge changes in small groups.
 
@@ -26,7 +26,7 @@ pnpm dlx create-nextdevtpl@<target-version> ../nextdevtpl-upgrade \
 6. Pass lint, type checking, tests, build, and a Preview health check before release.
 
 Repository maintainers can use the repository's
-[upgrade guide](https://github.com/evepupil/NextDevTpl/blob/master/docs/%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97.md).
+[upgrade guide](https://github.com/guyuedumingx/NextDevTpl/blob/master/docs/%E5%8D%87%E7%BA%A7%E6%8C%87%E5%8D%97.md).
 
 ## Combination checks
 
@@ -41,7 +41,7 @@ pnpm release:check
 
 Compatibility reports are written to `artifacts/compatibility/<case>.json`.
 See upstream
-[compatibility troubleshooting](https://github.com/evepupil/NextDevTpl/blob/master/docs/%E5%85%BC%E5%AE%B9%E6%80%A7%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
+[compatibility troubleshooting](https://github.com/guyuedumingx/NextDevTpl/blob/master/docs/%E5%85%BC%E5%AE%B9%E6%80%A7%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5.md)
 for common failures and Cloudflare Worker runtime diagnostics.
 
 ## Rollback principle

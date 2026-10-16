@@ -2,6 +2,7 @@
 
 import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Brand } from "@/components/brand";
 
 /**
  * Auth 品牌分屏的左侧面板
@@ -26,23 +27,7 @@ export function AuthBrandPanel() {
 
       {/* 顶部 logo */}
       <div className="relative flex items-center gap-2">
-        {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative logo */}
-        <svg
-          className="h-6 w-6 text-primary"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 17 L9 7 L13 14 L21 4" />
-          <circle cx="9" cy="7" r="1.4" fill="currentColor" stroke="none" />
-          <circle cx="21" cy="4" r="1.4" fill="currentColor" stroke="none" />
-        </svg>
-        <span className="text-lg font-bold tracking-tight text-foreground">
-          NextDev<span className="text-muted-foreground">Tpl</span>
-        </span>
+        <Brand />
       </div>
 
       {/* 中部：标题 + 卖点 */}

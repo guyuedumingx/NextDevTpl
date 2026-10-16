@@ -42,9 +42,12 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: "@nextdevtpl",
   },
   manifest: "/site.webmanifest",
+  icons: {
+    icon: "/brand/quickstarter-icon.png",
+    apple: "/brand/quickstarter-icon.png",
+  },
 };
 
 /**

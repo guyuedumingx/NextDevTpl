@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config";
+import { brandConfig } from "@/config/brand";
 
 type LocaleType = "en" | "zh";
 
@@ -16,8 +17,8 @@ export function generateWebSiteSchema(locale: LocaleType) {
     url: getBaseUrl(),
     description:
       locale === "en"
-        ? "Production-ready Next.js SaaS template with authentication, payments, credits, and i18n"
-        : "生产就绪的 Next.js SaaS 模板，内置认证、支付、积分与国际化",
+        ? brandConfig.descriptions.en
+        : brandConfig.descriptions.zh,
     inLanguage: locale === "en" ? "en-US" : "zh-CN",
     potentialAction: {
       "@type": "SearchAction",
@@ -39,13 +40,17 @@ export function generateOrganizationSchema() {
     "@type": "Organization",
     name: siteConfig.name,
     url: getBaseUrl(),
-    logo: `${getBaseUrl()}/logo.png`,
+    logo: `${getBaseUrl()}${brandConfig.mark}`,
     sameAs: [siteConfig.links.twitter, siteConfig.links.github].filter(Boolean),
-    contactPoint: {
-      "@type": "ContactPoint",
-      contactType: "customer support",
-      email: siteConfig.author.email,
-    },
+    ...(siteConfig.author.email
+      ? {
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer support",
+            email: siteConfig.author.email,
+          },
+        }
+      : {}),
   };
 }
 
@@ -90,7 +95,7 @@ export function generateArticleSchema(input: ArticleSchemaInput) {
     datePublished: publishedAt,
     dateModified: updatedAt || publishedAt,
     author: {
-      "@type": "Person",
+      "@type": "Organization",
       name: author || siteConfig.author.name,
     },
     publisher: {
@@ -98,7 +103,7 @@ export function generateArticleSchema(input: ArticleSchemaInput) {
       name: siteConfig.name,
       logo: {
         "@type": "ImageObject",
-        url: `${getBaseUrl()}/logo.png`,
+        url: `${getBaseUrl()}${brandConfig.mark}`,
       },
     },
     ...(image && {
@@ -176,8 +181,8 @@ export function generateSoftwareApplicationSchema(locale: LocaleType) {
     url: getBaseUrl(),
     description:
       locale === "en"
-        ? "Production-ready Next.js SaaS template with authentication, payments, credits, and i18n"
-        : "生产就绪的 Next.js SaaS 模板，内置认证、支付、积分与国际化",
+        ? brandConfig.descriptions.en
+        : brandConfig.descriptions.zh,
     offers: {
       "@type": "Offer",
       price: "0",

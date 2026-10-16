@@ -1,44 +1,31 @@
 {
   "HomePage": {
-    "title": "NextDevTpl",
-    "subtitle": "生产就绪的 Next.js SaaS 模板",
-    "description": "开箱即用的全栈 SaaS 模板，快速启动你的下一个项目。"
+    "title": "QuickStarter",
+    "subtitle": "让想法快速启程",
+    "description": "我们自己的产品开发底座。"
   },
   "Hero": {
-    "badge": "全新：支持 AI 模型集成",
-    "eyebrow": "Next.js 16 · Drizzle · Better Auth · Inngest",
-    "title1": "先把 SaaS 做出来。",
-    "titleHighlight": "别再纠结脚手架。",
-    "subtitle": "一套生产级的 Next.js 模板——认证、支付、积分、后台任务、国际化、管理后台，全部端到端接好。把第一周花在你的产品上，而不是第六个月的基建上。",
-    "getStarted": "开始构建",
-    "seeDemo": "看看怎么用",
-    "trustLine": "深受全球开发者喜爱",
-    "stats": {
-      "cards": "已创建项目",
-      "users": "开发者",
-      "rating": "满意度"
+    "eyebrow": "QUICKSTARTER · BUILD / LAUNCH / GROW",
+    "title1": "让想法，",
+    "titleHighlight": "快速启程。",
+    "subtitle": "属于我们自己的产品开发底座。把账户、积分、订单和工作台连接起来，让每一次新的尝试，都能从已有积累继续生长。",
+    "getStarted": "进入工作台",
+    "seeDemo": "阅读开发文档",
+    "principles": {
+      "modular": "按需组合",
+      "extendable": "持续扩展",
+      "owned": "自主掌控"
     },
-    "meta": {
-      "modules": "个功能模块",
-      "tests": "个测试，全绿",
-      "errors": "类型 / lint 错误",
-      "license": "可自托管 · MIT"
-    },
-    "panel": {
-      "title": "生产环境 · 读数",
-      "region": "/usr/app · us-east-1",
-      "p95": "P95 延迟",
-      "uptime": "可用性",
-      "jobs": "任务 / 分",
-      "signups": "注册 · 近 14 天",
-      "pillOk": "部署通过",
-      "pillStack": "Vercel · Neon · R2"
+    "foundation": {
+      "accounts": "账户体系",
+      "credits": "积分计量",
+      "workspace": "业务工作台"
     }
   },
   "Features": {
     "label": "核心功能",
     "title": "开箱即用的完整功能",
-    "subtitle": "从认证到支付，从国际化到管理后台，每个模块都经过精心打磨，让你专注于业务本身。",
+    "subtitle": "常用能力已经分开组织。保留需要的部分，再接入属于我们的业务。",
     "items": {
       "ai": {
         "title": "认证与安全",
@@ -46,7 +33,7 @@
       },
       "multiSource": {
         "title": "支付与订阅",
-        "description": "集成 Creem 支付，支持订阅和一次性购买，内置 Webhook 处理和订阅生命周期管理。"
+        "description": "通过独立适配器连接支付与订阅；正式收款需先配置并验证支付渠道。"
       },
       "outline": {
         "title": "积分系统",
@@ -68,31 +55,31 @@
   },
   "HowItWorks": {
     "label": "使用流程",
-    "title": "三步启动你的 SaaS",
-    "subtitle": "从模板到上线，只需要几步简单操作。",
+    "title": "从一个想法，到持续迭代",
+    "subtitle": "一次专注一个完整场景，让基础能力服务于业务。",
     "steps": {
       "upload": {
-        "title": "克隆 & 配置",
-        "description": "克隆模板仓库，配置环境变量（数据库、认证密钥等），运行 pnpm install 安装依赖。"
+        "title": "确定产品方向",
+        "description": "明确用户、核心场景与收费方式，先做好一个完整的使用流程。"
       },
       "generate": {
-        "title": "定制 & 开发",
-        "description": "根据你的业务需求定制功能模块，修改品牌信息、配色、定价方案，添加自定义业务逻辑。"
+        "title": "接入业务能力",
+        "description": "复用账户、积分与后台，再加入模型、支付和需要的服务。"
       },
       "export": {
-        "title": "部署 & 上线",
-        "description": "一键部署到 Vercel 或自有服务器，连接 Neon PostgreSQL 数据库，配置域名即可上线。"
+        "title": "验证并上线",
+        "description": "确认权限、账单和失败处理，再把验证过的版本交付给用户。"
       }
     },
     "completion": {
-      "title": "就是这么简单",
-      "description": "你的 SaaS 产品已准备就绪，随时可以上线运营。"
+      "title": "持续迭代",
+      "description": "每次上线后，继续完善体验、验证需求，积累自己的产品能力。"
     }
   },
   "UseCases": {
     "label": "适用场景",
-    "title": "适合各种 SaaS 产品",
-    "subtitle": "NextDevTpl 模板适用于多种类型的 SaaS 产品和业务场景。",
+    "title": "让新的产品，接着生长。",
+    "subtitle": "以下是可以继续开发的方向，具体功能以实际开放为准。",
     "items": {
       "students": {
         "title": "AI 产品",
@@ -120,71 +107,22 @@
       }
     }
   },
-  "Testimonials": {
-    "label": "用户评价",
-    "title": "听听开发者们怎么说",
-    "subtitle": "来自不同领域的开发者正在使用 NextDevTpl 模板快速构建产品。",
-    "items": [
-      {
-        "content": "用这个模板两周就上线了一个 AI 写作工具，认证、支付、积分系统全都不用自己写，节省了至少一个月的开发时间。",
-        "author": "林小雨",
-        "role": "独立开发者"
-      },
-      {
-        "content": "之前自己搭 SaaS 框架花了三个月，用了这个模板后发现认证、订阅、积分这些通用模块的完成度远超预期，代码质量也很高。",
-        "author": "张明远",
-        "role": "全栈工程师"
-      },
-      {
-        "content": "国际化方案开箱即用，中英双语直接可用，扩展其他语言也很方便。对需要做多语言市场的 SaaS 产品来说非常省心。",
-        "author": "陈思琪",
-        "role": "产品经理"
-      },
-      {
-        "content": "Inngest 异步任务的集成方案非常优雅，完美解决了 Vercel 60 秒超时的问题。我的 AI 产品不再需要担心长任务处理了。",
-        "author": "王浩然",
-        "role": "技术负责人"
-      },
-      {
-        "content": "积分系统的双重记账法实现得很专业，FIFO 批次过期逻辑也考虑到了。直接拿来用，不需要自己设计积分消费方案。",
-        "author": "李雨桐",
-        "role": "后端开发者"
-      },
-      {
-        "content": "管理后台已经有了用户管理和工单系统，对小团队来说已经足够用了。部署到自有服务器也很简单，文档写得很清楚。",
-        "author": "赵一鸣",
-        "role": "创业者"
-      }
-    ]
-  },
   "FAQ": {
     "label": "常见问题",
     "title": "你可能想了解的",
-    "subtitle": "关于 NextDevTpl 模板的常见问题与解答。",
+    "subtitle": "关于 QuickStarter 的使用与后续扩展。",
     "items": [
       {
-        "question": "NextDevTpl 是什么？",
-        "answer": "NextDevTpl 是一个基于 Next.js 16、React 19、TypeScript 的生产就绪 SaaS 模板。内置认证（Better Auth）、支付（Creem）、积分系统、异步任务处理（Inngest）、国际化、管理后台等完整功能，帮助开发者快速启动 SaaS 项目。"
+        "question": "QuickStarter 是什么？",
+        "answer": "这是我们基于开源基础持续开发的产品底座。账户、积分、管理后台与多语言能力已经连接，新的业务可以独立扩展。"
       },
       {
-        "question": "需要哪些技术基础？",
-        "answer": "你需要熟悉 React、TypeScript 和 Next.js 的基础知识。模板使用 Tailwind CSS 做样式，Drizzle ORM 做数据库操作，了解这些技术栈会帮助你更快上手。"
+        "question": "现在可以生成图片和视频吗？",
+        "answer": "当前还未接入图片或视频生成服务。后续会通过独立的模型适配器、异步任务和积分结算模块接入，开发完成后再开放。"
       },
       {
-        "question": "可以部署到哪些平台？",
-        "answer": "模板可以部署到 Vercel（推荐）、自有服务器或任何支持 Node.js 的平台。数据库推荐使用 Neon PostgreSQL（Serverless），文件存储使用 Cloudflare R2。"
-      },
-      {
-        "question": "积分系统是怎样的？",
-        "answer": "模板内置基于双重记账法的积分系统，支持积分发放、消耗、FIFO 批次过期、余额查询等完整功能。注册用户会获得免费积分，你可以根据业务需求自定义积分规则和定价方案。"
-      },
-      {
-        "question": "如何定制支付方案？",
-        "answer": "模板集成 Creem 支付，支持订阅和一次性购买。你可以在配置文件中自定义套餐名称、价格、积分额度和功能权限。Webhook 处理和订阅生命周期管理已经内置。"
-      },
-      {
-        "question": "支持哪些认证方式？",
-        "answer": "模板集成 Better Auth，支持邮箱密码注册登录、Google OAuth 和 GitHub OAuth。你可以轻松扩展其他 OAuth 提供商。会话管理、密码重置、邮箱验证等功能开箱即用。"
+        "question": "现在可以付费吗？",
+        "answer": "当前版本未开放正式收款。套餐、付款确认和权益发放需要完成支付渠道配置与验证后才会启用。"
       }
     ]
   },
@@ -274,25 +212,25 @@
       "cookies": "Cookie 设置"
     },
     "brand": {
-      "headline": "你的 SaaS，值得这条起跑线。",
-      "sub": "认证、支付、积分、后台任务、国际化、管理后台——全部端到端接好。你只管做产品，基建已经就绪。",
+      "headline": "下一个产品，从这里开始。",
+      "sub": "一个账户，连接我们的产品、积分和工作台。新的业务持续加入，已有的积累继续保留。",
       "points": {
-        "ship": "几天上线，而不是几个月",
-        "own": "MIT 协议，可自托管，不锁定",
-        "stack": "Next.js 16 · Drizzle · Better Auth · Inngest"
+        "ship": "专注自己的业务",
+        "own": "账户与数据自主掌控",
+        "stack": "为持续迭代而设计"
       },
       "stat": {
-        "k": "18",
-        "v": "个功能模块，端到端接好"
+        "k": "Q / S",
+        "v": "从一个想法，走向下一步。"
       }
     }
   },
   "CTA": {
-    "badge": "免费开始，无需信用卡",
-    "title": "准备好启动你的 SaaS 了吗？",
-    "subtitle": "注册即可获得免费积分，立即体验完整功能。用生产就绪的模板快速构建你的下一个产品。",
-    "getStarted": "免费注册",
-    "seeDemo": "查看演示"
+    "badge": "QUICKSTARTER",
+    "title": "给下一个想法，一个起点。",
+    "subtitle": "从自己的工作台开始，持续完善你的产品。",
+    "getStarted": "创建账号",
+    "seeDemo": "查看文档"
   },
   "DashboardPages": {
     "dashboard": {
@@ -870,11 +808,17 @@
     }
   },
   "Footer": {
-    "description": "生产就绪的 Next.js SaaS 模板，内置认证、支付、积分、国际化等功能。",
+    "description": "QuickStarter，我们自己的产品开发底座。从一个想法开始，向更多可能延伸。",
     "product": "产品",
     "legal": "法律",
     "copyright": "© {year} {name}。保留所有权利。",
     "twitter": "Twitter",
-    "github": "GitHub"
+    "github": "GitHub",
+    "docs": "文档",
+    "updates": "产品动态",
+    "support": "支持",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "cookies": "Cookie 政策"
   }
 }

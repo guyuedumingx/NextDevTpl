@@ -7,7 +7,7 @@ description: Configure typed telemetry, operational metrics, AI cost estimates, 
 
 The optional `operations` module is a local read model for an independent SaaS.
 It reads the generated project's database and business events; it does not send
-data to a NextDevTpl-hosted service. It requires `auth`, `admin`, and `payment`
+data to a QuickStarter-hosted service. It requires `auth`, `admin`, and `payment`
 through automatic module dependencies.
 
 ## Enable it
@@ -83,7 +83,7 @@ Select one adapter at generation time:
 | --- | --- | --- |
 | `noop` | None | Persists alert state without sending |
 | `email` | `ALERT_EMAIL_TO`, `EMAIL_FROM`, selected mail adapter | Sends text and escaped HTML |
-| `webhook` | `ALERT_WEBHOOK_URL`, optional `ALERT_WEBHOOK_SECRET` | Sends JSON and an optional HMAC-SHA256 `X-NextDevTpl-Signature` header |
+| `webhook` | `ALERT_WEBHOOK_URL`, optional `ALERT_WEBHOOK_SECRET` | Sends JSON and an optional HMAC-SHA256 `X-QuickStarter-Signature` header |
 
 The initial rules are payment failure rate (20%, two consecutive breaches), AI
 cost (smallest-unit threshold, one breach), and paid conversion (2%, two
@@ -127,7 +127,7 @@ regional transfer requirement has been completed.
 | Metric is `zero-data` | The period has no matching rows; create a real business event before changing the formula |
 | Metric is `not-configured` | The source is intentionally not wired, such as retention or log health |
 | Alert does not send | `CRON_SECRET`, selected adapter variables, mail adapter, cooldown, and alert delivery history |
-| Webhook rejected | Verify URL, JSON consumer, optional HMAC secret, and `X-NextDevTpl-Signature` validation |
+| Webhook rejected | Verify URL, JSON consumer, optional HMAC secret, and `X-QuickStarter-Signature` validation |
 | Client events missing | Analytics consent, browser network request to `/api/telemetry`, provider key/host, and redaction logs |
 | Cloudflare build fails on Windows | Build the generated project in a Linux-native directory or Linux CI; OpenNext may hit Windows symlink permissions |
 

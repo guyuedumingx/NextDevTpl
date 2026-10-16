@@ -1,3 +1,4 @@
+import { brandConfig } from "@/config/brand";
 /**
  * 支付配置
  *
@@ -144,14 +145,14 @@ export function getPricingPlans(_t?: (key: string) => string): Plan[] {
     plans.push({
       ...config.plans.free,
       name: "Free",
-      description: "Try NextDevTpl with no commitment",
+      description: `Explore ${brandConfig.name}`,
       features: [
         "200 credits (one-time)",
-        "Text & file input",
+        "Account and workspace",
         "Up to 10K characters per task",
         "Max 5MB file size",
-        "Export to Anki & Markdown",
-        "Deck history saved forever",
+        "Workspace access",
+        "Credit transaction history",
       ],
       cta: "Get Started",
     });
@@ -162,14 +163,14 @@ export function getPricingPlans(_t?: (key: string) => string): Plan[] {
     plans.push({
       ...config.plans.starter,
       name: "Starter",
-      description: "For casual learners",
+      description: "For getting started",
       features: [
         "3,000 credits / month",
-        "Text & file input",
+        "Account and workspace",
         "Up to 100K characters per task",
         "Max 20MB file size",
-        "Export to Anki & Markdown",
-        "Deck history saved forever",
+        "Workspace access",
+        "Credit transaction history",
         "Email support",
       ],
       cta: "Subscribe",
@@ -181,16 +182,16 @@ export function getPricingPlans(_t?: (key: string) => string): Plan[] {
     plans.push({
       ...config.plans.pro,
       name: "Pro",
-      description: "For serious learners",
+      description: "For growing projects",
       features: [
         "8,000 credits / month",
         "All input sources (URL, video, etc.)",
         "Up to 300K characters per task",
         "Max 50MB file size",
         "Priority generation queue",
-        "Export to Anki & Markdown",
-        "Deck history saved forever",
-        "🚧 Custom card styles (coming soon)",
+        "Workspace access",
+        "Credit transaction history",
+        "Additional features coming soon",
         "Priority support",
       ],
       cta: "Subscribe",
@@ -202,17 +203,17 @@ export function getPricingPlans(_t?: (key: string) => string): Plan[] {
     plans.push({
       ...config.plans.ultra,
       name: "Ultra",
-      description: "For power users & educators",
+      description: "For advanced workloads",
       features: [
         "16,000 credits / month",
         "All input sources (URL, video, etc.)",
         "Up to 1M characters per task",
         "Max 100MB file size",
         "Highest priority queue",
-        "Export to Anki & Markdown",
-        "Deck history saved forever",
-        "🚧 Custom card styles (coming soon)",
-        "🚧 AI-assisted card making (coming soon)",
+        "Workspace access",
+        "Credit transaction history",
+        "Additional features coming soon",
+        "Additional integrations coming soon",
         "Dedicated support",
       ],
       cta: "Subscribe",

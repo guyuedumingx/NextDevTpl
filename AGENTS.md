@@ -2,6 +2,12 @@
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
+## QuickStarter Product Conventions
+
+This fork is our QuickStarter product foundation. Brand identity lives in `src/config/brand.ts`; public URLs and optional contact/social settings live in `src/config/site.ts`. Use `src/components/brand.tsx` for every in-app brand mark. Do not reintroduce upstream author bios, demo testimonials, fabricated usage numbers, or claims that live payment/media generation is enabled.
+
+Preserve the upstream MIT license and generator identifiers such as `create-nextdevtpl` and `nextdevtpl.generated.json`. Add image/video generation behind new provider contracts and feature modules. See `docs/AI_MEDIA_ARCHITECTURE.md` for the implementation plan and current boundaries.
+
 ## Project Overview
 
 NextDevTpl is a composable, production-ready Next.js SaaS template. `create-nextdevtpl` generates a standalone project from selected product modules, service adapters, and a deployment target. Unselected source, dependencies, environment variables, database schema, and deployment files are removed.

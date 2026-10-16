@@ -1,44 +1,31 @@
 {
   "HomePage": {
-    "title": "NextDevTpl",
-    "subtitle": "Production-Ready Next.js SaaS Template",
-    "description": "Ship your SaaS product faster with a production-ready full-stack template."
+    "title": "QuickStarter",
+    "subtitle": "Build your next chapter",
+    "description": "A foundation for the products we build next."
   },
   "Hero": {
-    "badge": "New: AI Model Integration",
-    "eyebrow": "Next.js 16 · Drizzle · Better Auth · Inngest",
-    "title1": "Ship the SaaS.",
-    "titleHighlight": "Not the scaffolding.",
-    "subtitle": "A production-grade Next.js template with auth, payments, credits, background jobs, i18n, and an admin panel — wired end-to-end. Spend week one on your product, not month six of plumbing.",
-    "getStarted": "Start building",
-    "seeDemo": "See how it works",
-    "trustLine": "Trusted by developers worldwide",
-    "stats": {
-      "cards": "Projects Built",
-      "users": "Developers",
-      "rating": "Satisfaction"
+    "eyebrow": "QUICKSTARTER · BUILD / LAUNCH / GROW",
+    "title1": "Your next idea.",
+    "titleHighlight": "A stronger start.",
+    "subtitle": "A foundation for the products we build next. Bring accounts, credits, billing, and a workspace together, then make the experience your own.",
+    "getStarted": "Open workspace",
+    "seeDemo": "Explore the docs",
+    "principles": {
+      "modular": "Modular by design",
+      "extendable": "Built to evolve",
+      "owned": "Yours to build"
     },
-    "meta": {
-      "modules": "feature modules",
-      "tests": "tests, all passing",
-      "errors": "type / lint errors",
-      "license": "self-hostable, MIT"
-    },
-    "panel": {
-      "title": "Production · readout",
-      "region": "/usr/app · us-east-1",
-      "p95": "P95 latency",
-      "uptime": "Uptime",
-      "jobs": "Jobs / min",
-      "signups": "Signups · last 14d",
-      "pillOk": "Deploy passing",
-      "pillStack": "Vercel · Neon · R2"
+    "foundation": {
+      "accounts": "Accounts",
+      "credits": "Credits",
+      "workspace": "Workspace"
     }
   },
   "Features": {
     "label": "Core Features",
     "title": "Everything You Need to Launch",
-    "subtitle": "Every essential SaaS feature, pre-built and production-ready, so you can focus on what makes your product unique.",
+    "subtitle": "Common capabilities, organized into modules. Keep what you need and extend the rest.",
     "items": {
       "ai": {
         "title": "Auth & Security",
@@ -46,7 +33,7 @@
       },
       "multiSource": {
         "title": "Payment & Subscription",
-        "description": "Creem integration for subscriptions and one-time purchases. Four plan tiers with automatic billing cycle management."
+        "description": "Connect checkout and subscriptions through provider adapters. Live payments require provider setup and verification."
       },
       "outline": {
         "title": "Credits System",
@@ -68,31 +55,31 @@
   },
   "HowItWorks": {
     "label": "How It Works",
-    "title": "From Zero to Production in Three Steps",
-    "subtitle": "Get your SaaS up and running in minutes, not months.",
+    "title": "From an idea to an evolving product",
+    "subtitle": "Focus on one complete use case at a time.",
     "steps": {
       "upload": {
-        "title": "Clone & Configure",
-        "description": "Clone the repository, install dependencies with pnpm, and set your environment variables. Database, auth, and payments are ready to connect."
+        "title": "Choose a direction",
+        "description": "Define your users, their core task, and a focused first experience."
       },
       "generate": {
-        "title": "Customize & Build",
-        "description": "Replace the example features with your own business logic. The modular architecture keeps everything organized by feature domain."
+        "title": "Connect the experience",
+        "description": "Reuse accounts and credits, then connect the providers and services you need."
       },
       "export": {
-        "title": "Deploy & Launch",
-        "description": "Deploy to Vercel, your own server, or any Node.js host. Push your Drizzle schema, configure webhooks, and go live."
+        "title": "Verify and launch",
+        "description": "Verify permissions, billing, and failure handling before releasing to users."
       }
     },
     "completion": {
-      "title": "That's it!",
-      "description": "Your SaaS is live. Focus on growing your product and acquiring customers."
+      "title": "Keep evolving",
+      "description": "Improve the experience, validate demand, and build on what you learn."
     }
   },
   "UseCases": {
     "label": "Use Cases",
-    "title": "Build Any SaaS Product",
-    "subtitle": "NextDevTpl provides the foundation for a wide range of SaaS applications.",
+    "title": "A foundation with room to grow.",
+    "subtitle": "Directions for future development. Availability depends on the features we release.",
     "items": {
       "students": {
         "title": "AI Products",
@@ -124,71 +111,22 @@
       }
     }
   },
-  "Testimonials": {
-    "label": "Testimonials",
-    "title": "What Developers Say",
-    "subtitle": "Developers around the world are using NextDevTpl to ship their SaaS products faster.",
-    "items": [
-      {
-        "content": "I went from idea to paying customers in under a week. The auth, payments, and credits system saved me at least a month of development time.",
-        "author": "Sarah Lin",
-        "role": "Indie Hacker · AI Tools"
-      },
-      {
-        "content": "The Inngest integration for background jobs is a game-changer. I no longer worry about serverless timeouts when processing large tasks for my users.",
-        "author": "Michael Zhang",
-        "role": "Full-Stack Developer"
-      },
-      {
-        "content": "Having i18n baked in from the start made expanding to international markets seamless. We launched in English and Chinese simultaneously.",
-        "author": "Emily Chen",
-        "role": "Startup Founder"
-      },
-      {
-        "content": "The credits system with double-entry bookkeeping is incredibly well-designed. It took me five minutes to wire up usage metering for my API product.",
-        "author": "David Wang",
-        "role": "Senior Engineer · API Platform"
-      },
-      {
-        "content": "The modular feature architecture is exactly what I needed. Each domain is self-contained, so onboarding new developers to the codebase is effortless.",
-        "author": "Lisa Li",
-        "role": "Tech Lead · SaaS Startup"
-      },
-      {
-        "content": "I've tried dozens of SaaS boilerplates. This one stands out because it doesn't cut corners — the admin panel, support tickets, and subscription management all work end-to-end.",
-        "author": "Kevin Zhao",
-        "role": "Solo Developer · Productivity Tools"
-      }
-    ]
-  },
   "FAQ": {
     "label": "FAQ",
     "title": "Questions You Might Have",
-    "subtitle": "Common questions and answers about NextDevTpl.",
+    "subtitle": "Working with QuickStarter and extending it.",
     "items": [
       {
-        "question": "What is NextDevTpl?",
-        "answer": "NextDevTpl is a production-ready Next.js SaaS starter template. It includes authentication, payment processing, a credits system, background job processing, internationalization, an admin dashboard, and more — everything you need to launch a SaaS product quickly."
+        "question": "What is QuickStarter?",
+        "answer": "Our product foundation, extended from open-source software. Accounts, credits, administration, and localization provide a starting point for new features."
       },
       {
-        "question": "What tech stack does it use?",
-        "answer": "Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Shadcn/UI, Drizzle ORM with PostgreSQL, Better Auth for authentication, Creem for payments, Inngest for async processing, next-intl for i18n, and Biome for linting and formatting."
+        "question": "Can I generate images or videos today?",
+        "answer": "Image and video generation is not connected yet. It will be added through provider adapters, asynchronous jobs, and credit settlement before being made available."
       },
       {
-        "question": "How is the credits system designed?",
-        "answer": "The credits system uses double-entry bookkeeping with FIFO batch expiration. Every credit movement creates a transaction with debit and credit accounts. Credits can be granted via subscriptions, purchases, or admin actions, and consumed by any feature you build."
-      },
-      {
-        "question": "Can I customize the subscription plans?",
-        "answer": "Absolutely. The subscription plan configuration is centralized in a single config file. You can adjust plan names, pricing, credit allocations, feature limits, and billing cycles to match your product's needs."
-      },
-      {
-        "question": "Does it support background processing?",
-        "answer": "Yes. Inngest handles all background jobs, solving the serverless timeout problem. Tasks run asynchronously with status polling and progress tracking built in. You can easily add your own Inngest functions for any long-running work."
-      },
-      {
-        "question": "Is it ready for production?",
-        "answer": "Yes. The template includes rate limiting, error monitoring (Sentry), structured logging (Pino + Axiom), secure file storage (Cloudflare R2), and graceful degradation for optional services. It's designed to run on a VPS or any Node.js hosting platform."
+        "question": "Are live payments available?",
+        "answer": "Live payments are not enabled in this version. Checkout and entitlements will be enabled after the payment provider is configured and verified."
       }
     ]
   },
@@ -210,7 +148,7 @@
       "success": "Signed in successfully!",
       "resendVerification": "Resend verification email",
       "resendCooldown": "Resend in {seconds}s",
-      "noAccount": "Don\u0027t have an account?",
+      "noAccount": "Don't have an account?",
       "signUpLink": "Sign up",
       "errors": {
         "google": "Google sign-in failed. Please try again.",
@@ -272,31 +210,31 @@
       "error": "Failed to reset your password. Please request a new link."
     },
     "footer": {
-      "copyright": "\u00a9 {year} {name}. All rights reserved.",
+      "copyright": "© {year} {name}. All rights reserved.",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "cookies": "Cookie Settings"
     },
     "brand": {
-      "headline": "The head start your SaaS deserved.",
-      "sub": "Auth, payments, credits, background jobs, i18n, and an admin panel \u2014 wired end-to-end. You ship the product; the plumbing is done.",
+      "headline": "Make room for your next idea.",
+      "sub": "One account for our products, credits, and workspace. A consistent starting point as new experiences grow.",
       "points": {
-        "ship": "Production-ready in days, not months",
-        "own": "MIT-licensed, self-hostable, no lock-in",
-        "stack": "Next.js 16 \u00b7 Drizzle \u00b7 Better Auth \u00b7 Inngest"
+        "ship": "Focus on your product",
+        "own": "Keep control of your account",
+        "stack": "Designed to keep evolving"
       },
       "stat": {
-        "k": "18",
-        "v": "feature modules, wired end-to-end"
+        "k": "Q / S",
+        "v": "From the first idea to the next step."
       }
     }
   },
   "CTA": {
-    "badge": "Start free, no credit card required",
-    "title": "Ready to Launch Your SaaS?",
-    "subtitle": "Get started with a production-ready template and ship your product in days, not months. Everything you need is already built in.",
-    "getStarted": "Get Started Free",
-    "seeDemo": "Live Demo"
+    "badge": "QUICKSTARTER",
+    "title": "Give your next idea a place to start.",
+    "subtitle": "Start in your workspace, then build the experience your product needs.",
+    "getStarted": "Create an account",
+    "seeDemo": "Read the docs"
   },
   "DashboardPages": {
     "dashboard": {
@@ -874,11 +812,17 @@
     }
   },
   "Footer": {
-    "description": "Production-ready Next.js SaaS template with auth, payments, credits, i18n, and more.",
+    "description": "QuickStarter. A foundation for the products we build next. Start with an idea, keep growing.",
     "product": "Product",
     "legal": "Legal",
     "copyright": "© {year} {name}. All rights reserved.",
     "twitter": "Twitter",
-    "github": "GitHub"
+    "github": "GitHub",
+    "docs": "Docs",
+    "updates": "Updates",
+    "support": "Support",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookie Policy"
   }
 }

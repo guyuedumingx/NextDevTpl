@@ -19,8 +19,8 @@ export async function generateMetadata({
 
   const title = isZh ? "博客文章" : "Blog Posts";
   const description = isZh
-    ? "发现 NextDevTpl 团队的最新见解、教程和更新。了解产品最新动态。"
-    : "Discover the latest insights, tutorials, and updates from the NextDevTpl team. Learn about the latest product news.";
+    ? "发现 QuickStarter 团队的最新见解、教程和更新。了解产品最新动态。"
+    : "Discover the latest insights, tutorials, and updates from the QuickStarter team. Learn about the latest product news.";
 
   return {
     title,
@@ -82,8 +82,8 @@ export default async function BlogPage({
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
           {locale === "zh"
-            ? "发现 NextDevTpl 团队的最新见解、教程和更新。了解产品最新动态。"
-            : "Discover the latest insights, tutorials, and updates from the NextDevTpl team. Learn about the latest product news."}
+            ? "发现 QuickStarter 团队的最新见解、教程和更新。了解产品最新动态。"
+            : "Discover the latest insights, tutorials, and updates from the QuickStarter team. Learn about the latest product news."}
         </p>
       </div>
 

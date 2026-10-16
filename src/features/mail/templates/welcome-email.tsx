@@ -12,6 +12,8 @@ import {
   Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
+import { brandConfig } from "@/config/brand";
+import { siteConfig } from "@/config/site";
 
 /**
  * 欢迎邮件模板
@@ -33,14 +35,14 @@ export function WelcomeEmail({ name, dashboardUrl }: WelcomeEmailProps) {
   return (
     <Html>
       <Head />
-      <Preview>Welcome to NextDevTpl - Welcome aboard!</Preview>
+      <Preview>Welcome to {brandConfig.name}</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-xl rounded-lg border border-solid border-gray-200 p-8">
             {/* Logo / 品牌区域 */}
             <Section className="mb-8 text-center">
               <Heading className="m-0 text-2xl font-bold text-gray-900">
-                NextDevTpl
+                {brandConfig.name}
               </Heading>
             </Section>
 
@@ -51,37 +53,24 @@ export function WelcomeEmail({ name, dashboardUrl }: WelcomeEmailProps) {
 
             {/* 正文内容 */}
             <Text className="mb-4 text-base leading-relaxed text-gray-600">
-              We&apos;re thrilled to have you join NextDevTpl! Your account has
-              been successfully created and you&apos;re ready to start creating
-              flashcards.
+              We&apos;re thrilled to have you join {brandConfig.name}! Your
+              account has been successfully created and you&apos;re ready to
+              start using your workspace.
             </Text>
 
             <Text className="mb-6 text-base leading-relaxed text-gray-600">
-              As a welcome gift, we&apos;ve added{" "}
-              <strong>100 free credits</strong> to your account. Use them to
-              generate AI-powered flashcards from your learning materials.
+              Review your balance, manage your account, and follow product
+              updates from your workspace.
             </Text>
 
             {/* CTA 按钮 */}
             <Section className="mb-8 text-center">
               <Button
                 href={dashboardUrl}
-                className="inline-block rounded-md bg-violet-600 px-6 py-3 text-center text-sm font-semibold text-white no-underline"
+                className="inline-block rounded-md bg-teal-800 px-6 py-3 text-center text-sm font-semibold text-white no-underline"
               >
                 Go to Dashboard
               </Button>
-            </Section>
-
-            {/* 快速入门提示 */}
-            <Section className="mb-6 rounded-lg bg-gray-50 p-4">
-              <Text className="m-0 mb-2 text-sm font-semibold text-gray-900">
-                Quick Start Tips:
-              </Text>
-              <Text className="m-0 text-sm text-gray-600">
-                • Upload PDF, Word, or Markdown files to generate flashcards
-                <br />• Paste text or URLs to create cards instantly
-                <br />• Export to Anki format for spaced repetition learning
-              </Text>
             </Section>
 
             <Hr className="my-6 border-gray-200" />
@@ -90,15 +79,16 @@ export function WelcomeEmail({ name, dashboardUrl }: WelcomeEmailProps) {
             <Text className="m-0 text-center text-xs text-gray-500">
               Need help? Reply to this email or visit our{" "}
               <Link
-                href="https://example.com/docs"
-                className="text-violet-600 no-underline"
+                href={`${siteConfig.url}/en/docs`}
+                className="text-teal-800 no-underline"
               >
                 documentation
               </Link>
               .
             </Text>
             <Text className="m-0 mt-2 text-center text-xs text-gray-400">
-              © {new Date().getFullYear()} NextDevTpl. All rights reserved.
+              © {new Date().getFullYear()} {brandConfig.name}. All rights
+              reserved.
             </Text>
           </Container>
         </Body>

@@ -3,6 +3,7 @@
 import { ArrowLeft, ChevronsUpDown, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Brand } from "@/components/brand";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -59,20 +60,7 @@ export function AdminSidebar() {
     <aside className="dark fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       {/* Logo - Admin 标识 */}
       <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-        {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative logo */}
-        <svg
-          className="h-6 w-6 shrink-0 text-primary"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 17 L9 7 L13 14 L21 4" />
-          <circle cx="9" cy="7" r="1.4" fill="currentColor" stroke="none" />
-          <circle cx="21" cy="4" r="1.4" fill="currentColor" stroke="none" />
-        </svg>
+        <Brand compact />
         <span className="text-base font-bold tracking-tight">
           {siteConfig.name}
         </span>

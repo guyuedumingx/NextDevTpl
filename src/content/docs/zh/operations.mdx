@@ -6,7 +6,7 @@ description: 配置类型化埋点、运营指标、AI 成本估算、每日快�
 # 运营工具包
 
 可选的 `operations` 模块为独立 SaaS 提供本地运营读模型。它读取生成项目自己的
-数据库和服务端业务事件，不向 NextDevTpl 托管服务发送数据。模块会自动补齐
+数据库和服务端业务事件，不向 QuickStarter 托管服务发送数据。模块会自动补齐
 `auth`、`admin` 和 `payment` 依赖。
 
 ## 启用模块
@@ -78,7 +78,7 @@ pnpm dlx create-nextdevtpl@latest my-ops \
 | --- | --- | --- |
 | `noop` | 无 | 保存状态，不发送消息 |
 | `email` | `ALERT_EMAIL_TO`、`EMAIL_FROM` 和已选邮件适配器 | 发送纯文本和转义后的 HTML |
-| `webhook` | `ALERT_WEBHOOK_URL`、可选 `ALERT_WEBHOOK_SECRET` | 发送 JSON，可带 HMAC-SHA256 `X-NextDevTpl-Signature` |
+| `webhook` | `ALERT_WEBHOOK_URL`、可选 `ALERT_WEBHOOK_SECRET` | 发送 JSON，可带 HMAC-SHA256 `X-QuickStarter-Signature` |
 
 首批规则包括支付失败率（20%，连续两次）、AI 成本（超过最小货币单位阈值一次）和
 付费转化率（低于 2%，连续两次）。默认冷却时间为 30 分钟，恢复阈值独立设置，避免
@@ -115,7 +115,7 @@ curl -X POST https://your-domain.example/api/jobs/operations/alerts \
 | 指标为 `zero-data` | 周期内没有匹配行；先产生真实业务事件，再考虑改公式 |
 | 指标为 `not-configured` | 来源还未接入，例如留存或日志健康 |
 | 告警没有发送 | `CRON_SECRET`、已选适配器变量、邮件适配器、冷却时间和发送历史 |
-| Webhook 被拒绝 | URL、JSON 接收端、HMAC 密钥和 `X-NextDevTpl-Signature` 校验 |
+| Webhook 被拒绝 | URL、JSON 接收端、HMAC 密钥和 `X-QuickStarter-Signature` 校验 |
 | 浏览器事件缺失 | 分析同意、`/api/telemetry` 网络请求、供应商 Key/Host 和脱敏日志 |
 | Windows 上 Cloudflare 构建失败 | 把生成项目放到 Linux 原生目录或 Linux CI；OpenNext 可能遇到 Windows 符号链接权限问题 |
 

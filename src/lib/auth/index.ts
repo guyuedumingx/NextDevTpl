@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { brandConfig } from "@/config/brand";
 import { db } from "@/db";
 import * as schema from "@/db/schema/auth";
 import {
@@ -176,7 +177,7 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
-        subject: "Reset your password - NextDevTpl",
+        subject: `Reset your password - ${brandConfig.name}`,
         react: ResetPasswordEmail({
           resetUrl: url,
           name: user.name || "there",
@@ -195,7 +196,7 @@ export const auth = betterAuth({
           sendVerificationEmail: async ({ user, url }) => {
             await sendEmail({
               to: user.email,
-              subject: "Verify your email - NextDevTpl",
+              subject: `Verify your email - ${brandConfig.name}`,
               react: VerifyEmailEmail({
                 verifyUrl: url,
                 name: user.name || "there",

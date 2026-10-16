@@ -3,6 +3,7 @@
 import { ChevronDown, Menu } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { Brand } from "@/components/brand";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -75,29 +76,7 @@ export function Header() {
         <div className="flex items-center gap-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative logo */}
-            <svg
-              className="h-6 w-6 text-primary"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.4}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 17 L9 7 L13 14 L21 4" />
-              <circle cx="9" cy="7" r="1.4" fill="currentColor" stroke="none" />
-              <circle
-                cx="21"
-                cy="4"
-                r="1.4"
-                fill="currentColor"
-                stroke="none"
-              />
-            </svg>
-            <span className="text-xl font-bold tracking-tight">
-              NextDev<span className="text-muted-foreground">Tpl</span>
-            </span>
+            <Brand />
           </Link>
 
           {/* 导航菜单 (桌面端) */}

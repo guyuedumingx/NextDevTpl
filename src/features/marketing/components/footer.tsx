@@ -1,11 +1,20 @@
 import { Github, Twitter } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Brand } from "@/components/brand";
 
 import { footerNav, siteConfig } from "@/config";
 import { Link } from "@/i18n/routing";
 
 export function Footer() {
   const t = useTranslations("Footer");
+  const labels: Record<string, string> = {
+    Docs: t("docs"),
+    Updates: t("updates"),
+    Support: t("support"),
+    "Terms of Service": t("terms"),
+    "Privacy Policy": t("privacy"),
+    "Cookie Policy": t("cookies"),
+  };
 
   return (
     <footer className="border-t bg-background">
@@ -17,33 +26,7 @@ export function Footer() {
               href="/"
               className="mb-4 inline-flex items-center gap-2 text-xl font-bold"
             >
-              {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative logo */}
-              <svg
-                className="h-6 w-6 text-primary"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.4}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 17 L9 7 L13 14 L21 4" />
-                <circle
-                  cx="9"
-                  cy="7"
-                  r="1.4"
-                  fill="currentColor"
-                  stroke="none"
-                />
-                <circle
-                  cx="21"
-                  cy="4"
-                  r="1.4"
-                  fill="currentColor"
-                  stroke="none"
-                />
-              </svg>
-              {siteConfig.name}
+              <Brand />
             </Link>
             <p className="max-w-sm text-sm text-muted-foreground">
               {t("description")}
@@ -65,7 +48,7 @@ export function Footer() {
                         : {})}
                       className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      {link.title}
+                      {labels[link.title] || link.title}
                     </Link>
                   </li>
                 ))}
@@ -82,7 +65,7 @@ export function Footer() {
                       href={link.href}
                       className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      {link.title}
+                      {labels[link.title] || link.title}
                     </Link>
                   </li>
                 ))}
@@ -102,24 +85,28 @@ export function Footer() {
 
           {/* 社交链接 */}
           <div className="flex items-center gap-4">
-            <Link
-              href={siteConfig.links.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Twitter className="h-5 w-5" />
-              <span className="sr-only">{t("twitter")}</span>
-            </Link>
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Github className="h-5 w-5" />
-              <span className="sr-only">{t("github")}</span>
-            </Link>
+            {siteConfig.links.twitter && (
+              <Link
+                href={siteConfig.links.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Twitter className="h-5 w-5" />
+                <span className="sr-only">{t("twitter")}</span>
+              </Link>
+            )}
+            {siteConfig.links.github && (
+              <Link
+                href={siteConfig.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Github className="h-5 w-5" />
+                <span className="sr-only">{t("github")}</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>

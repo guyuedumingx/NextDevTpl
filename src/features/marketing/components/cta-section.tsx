@@ -38,7 +38,7 @@ export function CTASection() {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/dashboard/generate">{t("seeDemo")}</Link>
+                  <Link href="/docs">{t("seeDemo")}</Link>
                 </Button>
               </div>
             </div>

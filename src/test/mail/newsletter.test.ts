@@ -332,16 +332,12 @@ describe("Newsletter Reactivation", () => {
 
     await subscribeNewsletter(email);
 
-    const [original] = await testDb
-      .select()
-      .from(newsletterSubscriber)
-      .where(eq(newsletterSubscriber.email, email.toLowerCase()))
-      .limit(1);
-
-    const originalSubscribedAt = original!.subscribedAt;
-
-    // 等待一小段时间
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    // 使用明确的历史时间，避免数据库与应用时钟偏差导致偶发失败。
+    const originalSubscribedAt = new Date("2020-01-01T00:00:00.000Z");
+    await testDb
+      .update(newsletterSubscriber)
+      .set({ subscribedAt: originalSubscribedAt })
+      .where(eq(newsletterSubscriber.email, email.toLowerCase()));
 
     // 取消并重新激活
     await unsubscribeNewsletter(email);

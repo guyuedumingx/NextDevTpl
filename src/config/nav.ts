@@ -146,8 +146,6 @@ export const productsNav: ProductNavGroup[] = [
  */
 export const mainNav: NavItem[] = [
   { title: "Docs", href: "/docs" },
-  { title: "PSEO", href: "/pseo" },
-  { title: "Pricing", href: "/#pricing" },
   { title: "Blog", href: "/blog" },
 ];
 
@@ -157,12 +155,9 @@ export const mainNav: NavItem[] = [
 export const footerNav = {
   /** 产品 (Product) */
   product: [
-    { title: "Pricing", href: "/#pricing" },
-    { title: "Changelog", href: "/blog" },
-    {
-      title: "Contact Us",
-      href: `mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "hello@example.com"}`,
-    },
+    { title: "Docs", href: "/docs" },
+    { title: "Updates", href: "/blog" },
+    { title: "Support", href: "/dashboard/support" },
   ] as NavItem[],
 
   /** 法律 (Legal) */

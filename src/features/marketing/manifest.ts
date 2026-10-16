@@ -23,7 +23,6 @@ export const marketingModule = defineModule({
     "Features",
     "HowItWorks",
     "UseCases",
-    "Testimonials",
     "FAQ",
     "CTA",
     "Header",

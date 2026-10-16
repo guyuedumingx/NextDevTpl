@@ -3,6 +3,7 @@
 import { ChevronsUpDown, LogOut, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
+import { Brand } from "@/components/brand";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { dashboardConfig } from "@/config";
+import { dashboardConfig, siteConfig } from "@/config";
 import { useSidebar } from "@/features/dashboard/context";
 import { ModeToggle } from "@/features/shared";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
@@ -110,33 +111,14 @@ export function DashboardSidebar({
               }
             }}
           >
-            {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative logo */}
-            <svg
-              className="h-6 w-6 shrink-0 text-primary"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.4}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 17 L9 7 L13 14 L21 4" />
-              <circle cx="9" cy="7" r="1.4" fill="currentColor" stroke="none" />
-              <circle
-                cx="21"
-                cy="4"
-                r="1.4"
-                fill="currentColor"
-                stroke="none"
-              />
-            </svg>
+            <Brand compact />
             <span
               className={cn(
                 "text-lg font-bold tracking-tight transition-opacity",
                 collapsed && "opacity-0"
               )}
             >
-              NextDev<span className="text-muted-foreground">Tpl</span>
+              {siteConfig.name}
             </span>
           </Link>
         </div>

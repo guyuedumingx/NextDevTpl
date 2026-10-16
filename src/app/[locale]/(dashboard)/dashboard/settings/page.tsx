@@ -1,3 +1,4 @@
+import { siteConfig } from "@/config/site";
 import { SettingsProfileView } from "@/features/settings";
 import { type Locale, redirect } from "@/i18n/routing";
 import { getServerSession } from "@/lib/auth/server";
@@ -6,7 +7,7 @@ import { getServerSession } from "@/lib/auth/server";
  * 设置页面元数据
  */
 export const metadata = {
-  title: "Settings | NextDevTpl",
+  title: `Settings | ${siteConfig.name}`,
   description: "管理您的账户设置和偏好",
 };
 
